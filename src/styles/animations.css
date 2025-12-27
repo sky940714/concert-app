@@ -1,0 +1,73 @@
+/* 背景緩慢縮放 */
+@keyframes slow-pan {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+/* 雷射光束動畫 */
+@keyframes laser-1 {
+  0% { transform: rotate(-10deg); opacity: 0; }
+  50% { opacity: 0.8; }
+  100% { transform: rotate(10deg); opacity: 0; }
+}
+
+@keyframes laser-2 {
+  0% { transform: rotate(10deg); opacity: 0; }
+  50% { opacity: 0.8; }
+  100% { transform: rotate(-10deg); opacity: 0; }
+}
+
+/* 躍遷速度特效 */
+@keyframes warp-speed {
+  0% { opacity: 0; transform: scaleY(1); }
+  100% { opacity: 0; transform: scaleY(15); }
+}
+
+/* QR Code 掃描線 */
+@keyframes scan {
+  0% { top: 0; }
+  100% { top: 100%; }
+}
+
+/* 背景平移 */
+@keyframes pan {
+  0% { background-position: 0 0; }
+  100% { background-position: 100% 100%; }
+}
+
+/* 動畫類別 */
+.animate-laser-1 {
+  animation: laser-1 3s ease-in-out infinite;
+}
+
+.animate-laser-2 {
+  animation: laser-2 3s ease-in-out infinite 0.5s;
+}
+
+.animate-warp-speed {
+  animation: warp-speed 0.6s linear infinite;
+}
+
+.animate-pan {
+  animation: pan 30s linear infinite;
+}
+
+.animate-spin-slow {
+  animation: spin 8s linear infinite;
+}
+
+/* 安全區域 padding */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* 隱藏滾動條 */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
