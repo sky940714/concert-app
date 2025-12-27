@@ -6,51 +6,99 @@
 
 @layer base {
   :root {
-    /* Oh Cool 核心色標 */
-    --mint: #99E6D9;
-    --mint-deep: #76C4B7;
-    --coral: #FF8A65;
-    --soft-bg: #E0F7FA;
+    /* 色彩計畫 */
+    --bg-soft: #E0F7FA;       /* 極淺柔和藍 - 背景 */
+    --mint-main: #99E6D9;     /* 薄荷綠 - 主色 */
+    --mint-light: #B2F2E8;    /* 淺薄荷 */
+    --coral-main: #FF8A65;    /* 珊瑚橘 - 強調 */
+    --coral-dark: #FF7043;    /* 深珊瑚 */
+    --text-main: #475569;     /* 深灰 - 主要文字 */
+    --text-light: #94A3B8;    /* 淺灰 - 次要文字 */
+  }
+
+  body {
+    @apply bg-[#E0F7FA] text-slate-600;
   }
 }
 
 @layer components {
-  /* 黏土感卡片 */
-  .clay-card {
-    @apply bg-white border-white;
+  /* 核心黏土卡片 (白色基底) 
+    特點：霧面、柔和擴散陰影、內陰影強調厚度
+  */
+  .clay-card-white {
+    background: #ffffff;
+    border-radius: 2rem; /* 極度圓潤 */
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.5); /* 提升質感 */
+    /* 雙層陰影：外層擴散陰影 + 內層亮暗面模擬厚度 */
     box-shadow: 
-      10px 10px 20px rgba(0, 0, 0, 0.03),
-      inset 6px 6px 12px rgba(255, 255, 255, 0.9),
-      inset -6px -6px 12px rgba(0, 0, 0, 0.04);
+      12px 12px 24px rgba(166, 180, 200, 0.15),   /* 右下柔和陰影 */
+      -12px -12px 24px rgba(255, 255, 255, 0.8),  /* 左上高光 */
+      inset 2px 2px 4px rgba(255, 255, 255, 1),   /* 內部高光 */
+      inset -2px -2px 4px rgba(166, 180, 200, 0.05); /* 內部陰影 */
   }
 
-  /* 黏土感文字 */
-  .clay-text-coral {
-    color: var(--coral);
-    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+  /* 核心黏土卡片 (薄荷綠基底)
+    用於重點強調區塊
+  */
+  .clay-card-mint {
+    background: var(--mint-main);
+    border-radius: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 
+      8px 8px 16px rgba(118, 196, 183, 0.25),
+      -6px -6px 12px rgba(255, 255, 255, 0.4),
+      inset 3px 3px 6px rgba(255, 255, 255, 0.3),
+      inset -3px -3px 6px rgba(118, 196, 183, 0.1);
+  }
+
+  /* Q彈糖果按鈕 (珊瑚橘)
+    特點：高彩度、極強的立體感、點擊回彈
+  */
+  .clay-btn-orange {
+    background: var(--coral-main);
+    color: white;
+    border-radius: 9999px; /* Pill shape */
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); /* 彈跳動畫曲線 */
+    box-shadow: 
+      6px 6px 12px rgba(255, 138, 101, 0.4),      /* 彩色擴散陰影 */
+      inset -4px -4px 8px rgba(0, 0, 0, 0.1),     /* 底部厚度 */
+      inset 4px 4px 8px rgba(255, 255, 255, 0.4); /* 頂部高光 */
+  }
+
+  .clay-btn-orange:active {
+    transform: scale(0.92) translateY(2px);
+    box-shadow: 
+      2px 2px 4px rgba(255, 138, 101, 0.4),
+      inset -2px -2px 4px rgba(0, 0, 0, 0.1),
+      inset 2px 2px 4px rgba(255, 255, 255, 0.4);
+  }
+
+  /* 壓入式容器 (Inset)
+    用於歷史票券，模擬凹槽
+  */
+  .clay-inset {
+    background: #DAF0F5; /* 比背景稍深一點點 */
+    border-radius: 1.5rem;
+    box-shadow: 
+      inset 5px 5px 10px rgba(166, 180, 200, 0.15),
+      inset -5px -5px 10px rgba(255, 255, 255, 0.8);
+  }
+
+  /* 浮雕文字效果 */
+  .clay-text-title {
+    color: var(--text-main);
+    text-shadow: 2px 2px 4px rgba(166, 180, 200, 0.1), -1px -1px 0px rgba(255,255,255,0.5);
   }
 }
 
-/* 建議加入全域樣式或 Tailwind 擴充 */
-.clay-card {
-  background: #99E6D9; /* 薄荷綠 */
-  border-radius: 40px;
-  box-shadow: 
-    10px 10px 20px rgba(0, 0, 0, 0.05),              /* 外部擴散陰影 */
-    inset -8px -8px 15px rgba(0, 0, 0, 0.1),         /* 內部暗處（增加厚度） */
-    inset 8px 8px 15px rgba(255, 255, 255, 0.8);      /* 內部亮部（增加蓬鬆感） */
+/* 隱藏滾動條但保持功能 */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }
-
-.clay-button-orange {
-  background: #FF8A65; /* 珊瑚橘 */
-  border-radius: 30px;
-  box-shadow: 
-    0px 10px 20px rgba(255, 138, 101, 0.3),          /* 彩色擴散陰影 */
-    inset -6px -6px 10px rgba(0, 0, 0, 0.1), 
-    inset 6px 6px 10px rgba(255, 255, 255, 0.4);
-  transition: transform 0.2s ease;
-}
-
-.clay-button-orange:active {
-  transform: scale(0.92); /* 點擊時的回彈感 */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

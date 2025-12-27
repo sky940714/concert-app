@@ -1,4 +1,4 @@
-import { X, Disc, Sparkles } from 'lucide-react';
+import { X, Disc, Star, Sparkles, Quote } from 'lucide-react';
 import type { Ticket } from '../../types';
 
 interface MiniConcertViewProps {
@@ -8,41 +8,62 @@ interface MiniConcertViewProps {
 
 export const MiniConcertView = ({ ticket, onClose }: MiniConcertViewProps) => {
   return (
-    <div className="fixed inset-0 z-50 bg-black flex flex-col h-full overflow-hidden animate-in zoom-in duration-500 font-sans">
-      {/* 背景特效 */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className={`absolute inset-0 bg-gradient-to-br ${ticket.color} opacity-30 mix-blend-screen animate-pulse`} />
-        <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-black to-transparent" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-gradient-to-r from-white/10 to-transparent rounded-full blur-3xl animate-[spin_10s_linear_infinite]" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-          <Disc size={300} className="text-white/20 animate-[spin_5s_linear_infinite] drop-shadow-[0_0_30px_rgba(255,255,255,0.3)]" />
-        </div>
-        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-50 animate-pan" />
-      </div>
+    <div className="fixed inset-0 z-50 bg-[#E0F7FA]/90 backdrop-blur-sm flex flex-col items-center justify-center p-6 animate-in zoom-in duration-300 font-sans text-slate-600">
+      
+      {/* 關閉按鈕：漂浮在右上角的白色圓鈕 */}
+      <button 
+        onClick={onClose} 
+        className="absolute top-6 right-6 w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center text-slate-400 hover:text-[#FF8A65] active:scale-90 transition-all z-50"
+      >
+        <X size={24} strokeWidth={3} />
+      </button>
 
-      {/* 頂部導航 */}
-      <div className="flex justify-between items-center p-4 z-10 relative">
-        <button onClick={onClose} className="text-white/80 bg-white/10 p-2 rounded-full backdrop-blur-md hover:bg-white/20 transition-colors">
-          <X size={24} />
-        </button>
-        <div className="text-white font-bold tracking-widest text-sm uppercase border-b border-white/30 pb-1">珍藏回憶</div>
-        <div className="w-10" />
-      </div>
+      {/* 主體：精裝紀念相框 (白色黏土卡) */}
+      <div className="clay-card-white w-full max-w-md p-3 relative overflow-hidden flex flex-col items-center">
+        
+        {/* 頂部裝飾：票券打孔效果 */}
+        <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-[#E0F7FA] shadow-[inset_0_-2px_4px_rgba(0,0,0,0.1)]" />
 
-      {/* 內容 */}
-      <div className="flex-1 flex flex-col items-center justify-center p-10 relative z-10 text-center">
-        <div className="text-6xl mb-6 animate-bounce drop-shadow-lg">{ticket.img}</div>
-        <h2 className="text-3xl font-black text-white mb-2 drop-shadow-md leading-tight">{ticket.event}</h2>
-        <div className="text-white/70 font-medium text-lg mb-8">{ticket.date} • {ticket.venue}</div>
-        <div className="bg-white/10 backdrop-blur-md border border-white/20 p-6 rounded-2xl shadow-xl max-w-xs">
-          <p className="text-white/80 text-sm leading-relaxed font-mono">
-            感謝您參與這場音樂盛會。這段記憶已永久封存於您的演藝日誌中。期待下次啟航！
-          </p>
+        {/* 內部相片區 */}
+        <div className="w-full bg-slate-50 rounded-[1.5rem] p-8 pb-10 flex flex-col items-center relative overflow-hidden border border-slate-100">
+          
+          {/* 背景裝飾 */}
+          <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-[#E0F7FA] to-transparent opacity-60" />
+          
+          {/* 3D 圖標展示區 */}
+          <div className="relative mb-6 group">
+            <div className="absolute inset-0 bg-[#99E6D9] blur-xl opacity-40 animate-pulse rounded-full" />
+            <div className="clay-card-mint w-32 h-32 rounded-full flex items-center justify-center shadow-xl z-10 relative group-hover:scale-105 transition-transform duration-500">
+              <div className="text-4xl animate-bounce-slow drop-shadow-sm">
+                {ticket.img}
+              </div>
+            </div>
+            {/* 裝飾星星 */}
+            <Star className="absolute -top-2 -right-2 text-[#FFCC80] fill-[#FFCC80] animate-spin-slow" size={24} />
+            <Sparkles className="absolute -bottom-2 -left-2 text-[#FF8A65] animate-pulse" size={20} />
+          </div>
+
+          <h2 className="text-2xl font-black text-slate-700 text-center mb-2 tracking-tight">
+            {ticket.event}
+          </h2>
+          <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-8 bg-white px-3 py-1 rounded-full border border-slate-100 shadow-sm">
+            {ticket.date} • {ticket.venue}
+          </div>
+
+          {/* 感言區域：壓入式凹槽 */}
+          <div className="clay-inset w-full p-6 relative rounded-2xl bg-[#DAF0F5]">
+            <Quote size={24} className="absolute top-4 left-4 text-[#99E6D9] opacity-50" />
+            <p className="text-slate-500 text-sm font-bold leading-relaxed text-center relative z-10 px-2 pt-2">
+              這是一段值得珍藏的旅程。<br/>
+              感謝您的參與，這份回憶已永久封存於您的個人檔案中。
+            </p>
+          </div>
         </div>
-        <div className="mt-10 flex gap-2">
-          <Sparkles className="text-yellow-300 animate-pulse" />
-          <Sparkles className="text-cyan-300 animate-pulse delay-100" />
-          <Sparkles className="text-rose-300 animate-pulse delay-200" />
+
+        {/* 底部標籤 */}
+        <div className="py-4 flex items-center justify-center gap-2">
+           <Disc size={16} className="text-[#FF8A65] animate-spin-slow" />
+           <span className="text-xs font-black text-slate-400 tracking-[0.2em] uppercase">Memory Archived</span>
         </div>
       </div>
     </div>
