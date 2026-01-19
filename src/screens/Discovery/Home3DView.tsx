@@ -54,7 +54,7 @@ export default function Home3DView({ onRegionSelect, isLocked = false, isShrunke
     <div 
       className="w-full h-[650px] relative rounded-[2rem] overflow-hidden touch-none"
       style={{
-        backgroundColor: '#E0F7FA',
+        backgroundColor: '#ffffff',
         transform: 'translate3d(0, 0, 0)',
         WebkitTransform: 'translate3d(0, 0, 0)',
         isolation: 'isolate',
@@ -85,10 +85,10 @@ export default function Home3DView({ onRegionSelect, isLocked = false, isShrunke
       >
         <CanvasSizeController isShrunken={isShrunken} />
         
+        {/* ✅ 測試 6：加回所有光源 */}
         <ambientLight intensity={1.2} />
         
-        {/* ❌ 其他光源還不要加 */}
-        {/* <hemisphereLight 
+        <hemisphereLight 
           intensity={0.6} 
           color="#ffffff"
           groundColor="#E0F7FA" 
@@ -110,10 +110,10 @@ export default function Home3DView({ onRegionSelect, isLocked = false, isShrunke
           intensity={8} 
           color="#BAE6FD" 
         />
-        <pointLight position={[-10, 0, 10]} intensity={0.8} color="#FFD180" /> */}
+        
+        <pointLight position={[-10, 0, 10]} intensity={0.8} color="#FFD180" />
         
         <Suspense fallback={null}>
-          {/* ✅ 測試 5：用 Float 包裹 TaiwanModel */}
           <Float 
             speed={2} 
             rotationIntensity={0.1} 
