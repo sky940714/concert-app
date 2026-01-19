@@ -52,28 +52,51 @@ const InteractiveRegion = ({ position, onClick, label }: { position: [number, nu
 
 export default function Home3DView({ onRegionSelect, isLocked = false, isShrunken = false }: Home3DViewProps) {
   return (
-    <div className="w-full h-[650px] relative rounded-[2rem] overflow-hidden touch-none [transform:translateZ(0)]">
+    <div 
+      className="w-full h-[650px] relative rounded-[2rem] overflow-hidden touch-none"
+      style={{
+        // ✅ iOS 關鍵修復:確保 Canvas 容器有獨立的 GPU 圖層
+        transform: 'translate3d(0, 0, 0)',
+        WebkitTransform: 'translate3d(0, 0, 0)',
+        willChange: 'transform',
+        // ✅ iOS 優化:防止背景穿透
+        WebkitBackfaceVisibility: 'hidden',
+        backfaceVisibility: 'hidden',
+        // ✅ iOS 優化:隔離層級上下文
+        isolation: 'isolate',
+      }}
+    >
       
       <Canvas 
         camera={{ position: [0, 25, 30], fov: 50 }} 
         shadows
-        // 修正點 1: 固定 dpr 為 1.5 或 2，避免 iPhone 高倍率螢幕過載閃爍
-        dpr={1.5} 
+        // ✅ iOS 優化:限制 dpr 避免高解析度螢幕過載
+        dpr={[1, 2]} // 最小 1,最大 2,讓 iOS 自動選擇
         gl={{ 
           antialias: true, 
           alpha: true,
           powerPreference: "high-performance",
           depth: true,
           stencil: false,
-          // 修正點 2: 關閉 preserveDrawingBuffer 以避免 iOS 緩衝區閃爍
-          preserveDrawingBuffer: false 
+          // ✅ iOS 修復:關閉 preserveDrawingBuffer 避免緩衝區閃爍
+          preserveDrawingBuffer: false,
+          // ✅ iOS 優化:啟用失速檢測
+          failIfMajorPerformanceCaveat: false,
         }}
         onCreated={({ gl }) => {
-          // 修正點 3: 強制清理顏色並開啟自動清理，確保畫面不殘留黑影
+          // ✅ iOS 修復:強制清理背景色為透明
           gl.setClearColor('#F0F9FF', 0);
           gl.autoClear = true;
+          // ✅ iOS 優化:設定色彩空間
+          gl.outputColorSpace = 'srgb';
         }}
-        style={{ width: '100%', height: '100%' }}
+        style={{ 
+          width: '100%', 
+          height: '100%',
+          // ✅ iOS 優化:確保 Canvas 本身也有 GPU 加速
+          transform: 'translateZ(0)',
+          WebkitTransform: 'translateZ(0)',
+        }}
         resize={{ scroll: false, debounce: 0 }}
       >
         
@@ -87,8 +110,8 @@ export default function Home3DView({ onRegionSelect, isLocked = false, isShrunke
           intensity={2.5} 
           color="#ffffff" 
           castShadow 
-          // 修正點 4: 稍微加大 bias 避免 iOS 上的陰影條紋閃爍
-          shadow-bias={-0.001} 
+          // ✅ iOS 修復:調整 shadow-bias 避免陰影閃爍
+          shadow-bias={-0.0005}
         />
 
         <SpotLight
@@ -121,7 +144,7 @@ export default function Home3DView({ onRegionSelect, isLocked = false, isShrunke
           </Float>
         </Suspense>
 
-        {/* 修正點 5: 調整陰影位置與模糊度，防止與模型產生深度衝突 (Z-fighting) */}
+        {/* ✅ iOS 修復:調整陰影參數避免 Z-fighting */}
         <ContactShadows 
           position={[0, -6.5, 0]}
           opacity={0.3}
