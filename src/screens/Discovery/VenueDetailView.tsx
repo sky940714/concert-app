@@ -9,7 +9,7 @@ interface VenueDetailViewProps {
 // 模擬數據 (延用原本邏輯但對應新風格)
 const MOCK_VENUES_DATA: any = {
   "1": { name: "陽光小巨蛋", city: "Taipei", img: "🏟️", capacity: "15,000", status: "Hot", events: [
-    { id: 'e1', title: 'Oh Cool 音樂祭', date: '2025-12-25', price: '$1,200' },
+    { id: 'e1', title: 'TREASURE 台北演唱會', date: '2025-12-25', price: '$1,200' },
     { id: 'e2', title: '周杰倫《嘉年華世界巡迴演唱會2025》', date: '2026-01-05', price: '$3500' }
   ]}
 };
