@@ -68,7 +68,7 @@ export default function Home3DView({ onRegionSelect, isLocked = false, isShrunke
         frameloop="always"
         gl={{ 
           antialias: true, 
-          alpha: true
+          alpha: true,
           powerPreference: "high-performance",
           stencil: false,
           depth: true,
