@@ -54,7 +54,7 @@ export default function Home3DView({ onRegionSelect, isLocked = false, isShrunke
     <div 
       className="w-full h-[650px] relative rounded-[2rem] overflow-hidden touch-none"
       style={{
-        backgroundColor: 'transparent', // 修改：這裡改為透明，由背景組件提供顏色
+         backgroundColor: '#E0F7FA', // 改成實色
         transform: 'translate3d(0, 0, 0)',
         WebkitTransform: 'translate3d(0, 0, 0)',
         isolation: 'isolate',
