@@ -54,7 +54,7 @@ export default function Home3DView({ onRegionSelect, isLocked = false, isShrunke
     <div 
       className="w-full h-[650px] relative rounded-[2rem] overflow-hidden touch-none"
       style={{
-        backgroundColor: 'transparent',  // ✅ 改回透明
+        backgroundColor: 'transparent',
         transform: 'translate3d(0, 0, 0)',
         WebkitTransform: 'translate3d(0, 0, 0)',
         isolation: 'isolate',
@@ -132,7 +132,6 @@ export default function Home3DView({ onRegionSelect, isLocked = false, isShrunke
           <InteractiveRegion position={[-2, 4.5, 9]} label="南部熱區" onClick={() => onRegionSelect?.('south')} /> */}
         </Suspense>
 
-        {/* ✅ 測試 7：加回 ContactShadows */}
         <ContactShadows 
           position={[0, -6.5, 0]}
           opacity={0.3}
@@ -142,10 +141,11 @@ export default function Home3DView({ onRegionSelect, isLocked = false, isShrunke
           color="#1e293b" 
         />
         
-        {/* ❌ Sparkles 和 OrbitControls 還不要加 */}
-        {/* <Sparkles count={40} scale={20} size={4} speed={0.4} opacity={0.5} color="#FF8A65" position={[0, 0, 5]} />
+        {/* ✅ 測試 8：加回 Sparkles */}
+        <Sparkles count={40} scale={20} size={4} speed={0.4} opacity={0.5} color="#FF8A65" position={[0, 0, 5]} />
         
-        <OrbitControls 
+        {/* ❌ OrbitControls 還不要加 */}
+        {/* <OrbitControls 
           enableZoom={true} 
           enablePan={false} 
           enabled={!isLocked}
