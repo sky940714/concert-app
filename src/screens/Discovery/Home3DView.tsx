@@ -105,13 +105,13 @@ export default function Home3DView({ onRegionSelect, isLocked = false, isShrunke
         </Suspense>
 
         <ContactShadows 
-          position={[0, -5, 0]} 
-          opacity={0.5} 
-          scale={40} 
-          blur={2} 
-          far={10} 
-          color="#1e293b" 
-        />
+            position={[0, -5.5, 0]} // 從 -5 改為 -5.5，增加與島嶼底部的距離
+            opacity={0.4}           // 稍微調低透明度，減少閃爍的視覺衝擊
+            blur={2.5}              // 稍微增加模糊度
+            scale={40} 
+            far={10} 
+            color="#1e293b" 
+            />
         
         <Sparkles count={40} scale={20} size={4} speed={0.4} opacity={0.5} color="#FF8A65" position={[0, 0, 5]} />
         
