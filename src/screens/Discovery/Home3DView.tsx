@@ -54,41 +54,45 @@ export default function Home3DView({ onRegionSelect, isLocked = false, isShrunke
     <div 
       className="w-full h-[650px] relative rounded-[2rem] overflow-hidden touch-none"
       style={{
-         backgroundColor: '#E0F7FA', // 改成實色
-        transform: 'translate3d(0, 0, 0)',
-        WebkitTransform: 'translate3d(0, 0, 0)',
-        isolation: 'isolate',
+        backgroundColor: '#E0F7FA', // 保持實色背景
+        // ✅ 測試：移除可能衝突的 transform
+        // transform: 'translate3d(0, 0, 0)',
+        // WebkitTransform: 'translate3d(0, 0, 0)',
+        // isolation: 'isolate',
       }}
     >
       <Canvas 
         camera={{ position: [0, 25, 30], fov: 50 }} 
-        shadows
+        // shadows  // ✅ 測試 A：關閉 shadows
         dpr={[1, 2]}
         frameloop="always"
         gl={{ 
           antialias: true, 
-          alpha: true,               // 重要：必須開啟以配合 CSS 背景
+          alpha: false,  // ✅ 保持不透明
           powerPreference: "high-performance",
           stencil: false,
           depth: true,
-          premultipliedAlpha: false, // 重要：修復 iOS 透明邊緣閃爍
+          premultipliedAlpha: false,
         }}
-        onCreated={({ gl }) => {
-          gl.setClearColor(0x000000, 0); // 重要：設定完全透明
-          gl.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        }}
+        // ✅ 測試 A：移除 onCreated
+        // onCreated={({ gl }) => {
+        //   gl.setClearColor(0x000000, 0);
+        //   gl.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        // }}
         style={{ 
           width: '100%', 
           height: '100%',
-          transform: 'translateZ(0)',
-          WebkitTransform: 'translateZ(0)',
         }}
         resize={{ scroll: false, debounce: 0 }}
       >
-        <CanvasSizeController isShrunken={isShrunken} />
+        {/* ✅ 測試 A：註解掉 CanvasSizeController */}
+        {/* <CanvasSizeController isShrunken={isShrunken} /> */}
         
+        {/* ✅ 只保留最基本的光源 */}
         <ambientLight intensity={1.2} />
-        <hemisphereLight 
+        
+        {/* ❌ 測試 A：註解掉其他光源 */}
+        {/* <hemisphereLight 
           intensity={0.6} 
           color="#ffffff"
           groundColor="#E0F7FA" 
@@ -110,27 +114,31 @@ export default function Home3DView({ onRegionSelect, isLocked = false, isShrunke
           intensity={8} 
           color="#BAE6FD" 
         />
-        <pointLight position={[-10, 0, 10]} intensity={0.8} color="#FFD180" />
+        <pointLight position={[-10, 0, 10]} intensity={0.8} color="#FFD180" /> */}
         
         <Suspense fallback={null}>
-          <Float 
+          {/* ✅ 測試 A：移除 Float 包裹，直接渲染模型 */}
+          <TaiwanModel 
+            scale={18} 
+            position={[1, 0, -2]} 
+            rotation={[0.18, -6.7, 0]} 
+          />
+          
+          {/* ❌ 測試 A：註解掉互動區域 */}
+          {/* <Float 
             speed={2} 
             rotationIntensity={0.1} 
             floatIntensity={0.5} 
             floatingRange={[-0.5, 0.5]}
           >
-            <TaiwanModel 
-                scale={18} 
-                position={[1, 0, -2]} 
-                rotation={[0.18, -6.7, 0]} 
-            />
             <InteractiveRegion position={[4.5, 7, -10]} label="北部熱區" onClick={() => onRegionSelect?.('north')} />
             <InteractiveRegion position={[0, 5, .05]} label="中部熱區" onClick={() => onRegionSelect?.('center')} />
             <InteractiveRegion position={[-2, 4.5, 9]} label="南部熱區" onClick={() => onRegionSelect?.('south')} />
-          </Float>
+          </Float> */}
         </Suspense>
 
-        <ContactShadows 
+        {/* ❌ 測試 A：註解掉陰影和特效 */}
+        {/* <ContactShadows 
           position={[0, -6.5, 0]}
           opacity={0.3}
           blur={3.5}
@@ -149,7 +157,7 @@ export default function Home3DView({ onRegionSelect, isLocked = false, isShrunke
           maxPolarAngle={Math.PI / 2.2}
           minAzimuthAngle={-Math.PI / 4}
           maxAzimuthAngle={Math.PI / 4}
-        />
+        /> */}
       </Canvas>
     </div>
   )
