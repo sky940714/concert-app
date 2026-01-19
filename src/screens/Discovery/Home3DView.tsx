@@ -55,14 +55,10 @@ export default function Home3DView({ onRegionSelect, isLocked = false, isShrunke
     <div 
       className="w-full h-[650px] relative rounded-[2rem] overflow-hidden touch-none"
       style={{
-        // ✅ iOS 關鍵修復:確保 Canvas 容器有獨立的 GPU 圖層
+        // ✅ iOS 修復:給容器加上背景色 (關鍵!)
+        backgroundColor: '#F0F9FF',
         transform: 'translate3d(0, 0, 0)',
         WebkitTransform: 'translate3d(0, 0, 0)',
-        willChange: 'transform',
-        // ✅ iOS 優化:防止背景穿透
-        WebkitBackfaceVisibility: 'hidden',
-        backfaceVisibility: 'hidden',
-        // ✅ iOS 優化:隔離層級上下文
         isolation: 'isolate',
       }}
     >
@@ -70,30 +66,26 @@ export default function Home3DView({ onRegionSelect, isLocked = false, isShrunke
       <Canvas 
         camera={{ position: [0, 25, 30], fov: 50 }} 
         shadows
-        // ✅ iOS 優化:限制 dpr 避免高解析度螢幕過載
-        dpr={[1, 2]} // 最小 1,最大 2,讓 iOS 自動選擇
+        dpr={[1, 2]}
         gl={{ 
           antialias: true, 
-          alpha: true,
+          // ✅ iOS 關鍵修復:關閉透明度 (從 true 改成 false!)
+          alpha: false,
           powerPreference: "high-performance",
           depth: true,
           stencil: false,
-          // ✅ iOS 修復:關閉 preserveDrawingBuffer 避免緩衝區閃爍
           preserveDrawingBuffer: false,
-          // ✅ iOS 優化:啟用失速檢測
           failIfMajorPerformanceCaveat: false,
         }}
         onCreated={({ gl }) => {
-          // ✅ iOS 修復:強制清理背景色為透明
-          gl.setClearColor('#F0F9FF', 0);
+          // ✅ iOS 修復:設定不透明背景 (alpha 從 0 改成 1!)
+          gl.setClearColor('#F0F9FF', 1);
           gl.autoClear = true;
-          // ✅ iOS 優化:設定色彩空間
           gl.outputColorSpace = 'srgb';
         }}
         style={{ 
           width: '100%', 
           height: '100%',
-          // ✅ iOS 優化:確保 Canvas 本身也有 GPU 加速
           transform: 'translateZ(0)',
           WebkitTransform: 'translateZ(0)',
         }}
@@ -110,7 +102,6 @@ export default function Home3DView({ onRegionSelect, isLocked = false, isShrunke
           intensity={2.5} 
           color="#ffffff" 
           castShadow 
-          // ✅ iOS 修復:調整 shadow-bias 避免陰影閃爍
           shadow-bias={-0.0005}
         />
 
@@ -144,7 +135,6 @@ export default function Home3DView({ onRegionSelect, isLocked = false, isShrunke
           </Float>
         </Suspense>
 
-        {/* ✅ iOS 修復:調整陰影參數避免 Z-fighting */}
         <ContactShadows 
           position={[0, -6.5, 0]}
           opacity={0.3}
