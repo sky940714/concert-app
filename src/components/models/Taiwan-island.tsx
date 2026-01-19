@@ -22,9 +22,19 @@ export function Model(props: React.JSX.IntrinsicElements['group']) {
          不再手動添加 <meshStandardMaterial> 去覆蓋它
       */}
       <mesh 
-        geometry={nodes.model.geometry} 
-        material={materials.model} 
-      />
+  geometry={nodes.model.geometry} 
+  material={materials.model} 
+  onUpdate={(self) => {
+    // 1. 檢查材質是否存在且不是陣列
+    if (self.material && !Array.isArray(self.material)) {
+      // 2. 使用型別斷言將其視為 MeshStandardMaterial 以符合屬性要求
+      const mat = self.material as THREE.MeshStandardMaterial;
+      mat.polygonOffset = true;
+      mat.polygonOffsetFactor = 1;
+      mat.polygonOffsetUnits = 1;
+    }
+  }}
+/>
     </group>
   )
 }

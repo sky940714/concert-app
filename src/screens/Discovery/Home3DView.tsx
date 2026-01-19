@@ -55,13 +55,17 @@ export default function Home3DView({ onRegionSelect, isLocked = false, isShrunke
     <div className="w-full h-[650px] relative rounded-[2rem] overflow-hidden touch-none">
       
       <Canvas 
-        camera={{ position: [0, 25, 30], fov: 50 }} 
-        shadows
-        // ✅ 確保 Canvas 使用完整容器尺寸
-        style={{ width: '100%', height: '100%' }}
-        // ✅ 重要:防止 Canvas 內部錯誤調整尺寸
-        resize={{ scroll: false, debounce: 0 }}
-      >        
+  camera={{ position: [0, 25, 30], fov: 50 }} 
+  shadows
+  // 新增 gl 屬性來優化 iOS 渲染
+  gl={{ 
+    antialias: true, 
+    powerPreference: "high-performance",
+    preserveDrawingBuffer: true 
+  }}
+  style={{ width: '100%', height: '100%' }}
+  resize={{ scroll: false, debounce: 0 }}
+>
         
         {/* ✅ 加入尺寸控制器 */}
         <CanvasSizeController isShrunken={isShrunken} />
@@ -69,11 +73,12 @@ export default function Home3DView({ onRegionSelect, isLocked = false, isShrunke
         <Environment preset="city" blur={0.8} />
         <ambientLight intensity={0.8} />       
         <directionalLight 
-          position={[10, 20, 10]} 
-          intensity={2.5} 
-          color="#ffffff" 
-          castShadow 
-        />
+  position={[10, 20, 10]} 
+  intensity={2.5} 
+  color="#ffffff" 
+  castShadow 
+  shadow-bias={-0.0005} // 新增這行：防止陰影條紋與閃爍
+/>
         <SpotLight
           position={[-20, 10, -10]}
           angle={0.5}
