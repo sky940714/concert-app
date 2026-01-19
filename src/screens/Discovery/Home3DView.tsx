@@ -54,7 +54,7 @@ export default function Home3DView({ onRegionSelect, isLocked = false, isShrunke
     <div 
       className="w-full h-[650px] relative rounded-[2rem] overflow-hidden touch-none"
       style={{
-        backgroundColor: '#E0F7FA', // 保持實色背景
+        backgroundColor: '#E0F7FA',
         transform: 'translate3d(0, 0, 0)',
         WebkitTransform: 'translate3d(0, 0, 0)',
         isolation: 'isolate',
@@ -74,8 +74,8 @@ export default function Home3DView({ onRegionSelect, isLocked = false, isShrunke
           premultipliedAlpha: false,
         }}
         onCreated={({ gl }) => {
-            gl.setClearColor(0x000000, 0);
-            gl.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+          gl.setClearColor(0x000000, 0);
+          gl.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         }}
         style={{ 
           width: '100%', 
@@ -83,13 +83,11 @@ export default function Home3DView({ onRegionSelect, isLocked = false, isShrunke
         }}
         resize={{ scroll: false, debounce: 0 }}
       >
+        <CanvasSizeController isShrunken={isShrunken} />
         
-       <CanvasSizeController isShrunken={isShrunken} />
-        
-        {/* ✅ 只保留最基本的光源 */}
         <ambientLight intensity={1.2} />
         
-        {/* ❌ 測試 A：註解掉其他光源 */}
+        {/* ❌ 其他光源還不要加 */}
         {/* <hemisphereLight 
           intensity={0.6} 
           color="#ffffff"
@@ -115,27 +113,27 @@ export default function Home3DView({ onRegionSelect, isLocked = false, isShrunke
         <pointLight position={[-10, 0, 10]} intensity={0.8} color="#FFD180" /> */}
         
         <Suspense fallback={null}>
-          {/* ✅ 測試 A：移除 Float 包裹，直接渲染模型 */}
-          <TaiwanModel 
-            scale={18} 
-            position={[1, 0, -2]} 
-            rotation={[0.18, -6.7, 0]} 
-          />
-          
-          {/* ❌ 測試 A：註解掉互動區域 */}
-          {/* <Float 
+          {/* ✅ 測試 5：用 Float 包裹 TaiwanModel */}
+          <Float 
             speed={2} 
             rotationIntensity={0.1} 
             floatIntensity={0.5} 
             floatingRange={[-0.5, 0.5]}
           >
-            <InteractiveRegion position={[4.5, 7, -10]} label="北部熱區" onClick={() => onRegionSelect?.('north')} />
-            <InteractiveRegion position={[0, 5, .05]} label="中部熱區" onClick={() => onRegionSelect?.('center')} />
-            <InteractiveRegion position={[-2, 4.5, 9]} label="南部熱區" onClick={() => onRegionSelect?.('south')} />
-          </Float> */}
+            <TaiwanModel 
+              scale={18} 
+              position={[1, 0, -2]} 
+              rotation={[0.18, -6.7, 0]} 
+            />
+          </Float>
+          
+          {/* ❌ InteractiveRegion 還不要加 */}
+          {/* <InteractiveRegion position={[4.5, 7, -10]} label="北部熱區" onClick={() => onRegionSelect?.('north')} />
+          <InteractiveRegion position={[0, 5, .05]} label="中部熱區" onClick={() => onRegionSelect?.('center')} />
+          <InteractiveRegion position={[-2, 4.5, 9]} label="南部熱區" onClick={() => onRegionSelect?.('south')} /> */}
         </Suspense>
 
-        {/* ❌ 測試 A：註解掉陰影和特效 */}
+        {/* ❌ 陰影和特效還不要加 */}
         {/* <ContactShadows 
           position={[0, -6.5, 0]}
           opacity={0.3}
