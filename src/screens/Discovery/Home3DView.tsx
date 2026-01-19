@@ -10,12 +10,12 @@ import {
   Html 
 } from '@react-three/drei'
 import { Model as TaiwanModel } from '../../components/models/Taiwan-island'
-import { CanvasSizeController } from '../../components/effects' // ✅ 引入
+import { CanvasSizeController } from '../../components/effects'
 
 interface Home3DViewProps {
   onRegionSelect?: (regionId: 'north' | 'center' | 'south') => void;
   isLocked?: boolean;
-  isShrunken?: boolean; // ✅ 新增 prop
+  isShrunken?: boolean;
 }
 
 const InteractiveRegion = ({ position, onClick, label }: { position: [number, number, number], onClick: () => void, label: string }) => {
@@ -52,39 +52,45 @@ const InteractiveRegion = ({ position, onClick, label }: { position: [number, nu
 
 export default function Home3DView({ onRegionSelect, isLocked = false, isShrunken = false }: Home3DViewProps) {
   return (
-    <div className="w-full h-[650px] relative rounded-[2rem] overflow-hidden touch-none">
+    <div className="w-full h-[650px] relative rounded-[2rem] overflow-hidden touch-none [transform:translateZ(0)]">
       
       <Canvas 
-  camera={{ position: [0, 25, 30], fov: 50 }} 
-  shadows
-  dpr={[1, 2]} // 限制像素比減少 GPU 負擔
-  gl={{ 
-    antialias: true, 
-    alpha: true,
-    powerPreference: "high-performance",
-    depth: true,
-    stencil: false
-  }}
-  onCreated={({ gl }) => {
-    // 強制 WebGL 背景清理為白色/淡藍色而非黑色
-    gl.setClearColor('#F0F9FF', 1);
-  }}
-  style={{ width: '100%', height: '100%' }}
-  resize={{ scroll: false, debounce: 0 }}
->
+        camera={{ position: [0, 25, 30], fov: 50 }} 
+        shadows
+        // 修正點 1: 固定 dpr 為 1.5 或 2，避免 iPhone 高倍率螢幕過載閃爍
+        dpr={1.5} 
+        gl={{ 
+          antialias: true, 
+          alpha: true,
+          powerPreference: "high-performance",
+          depth: true,
+          stencil: false,
+          // 修正點 2: 關閉 preserveDrawingBuffer 以避免 iOS 緩衝區閃爍
+          preserveDrawingBuffer: false 
+        }}
+        onCreated={({ gl }) => {
+          // 修正點 3: 強制清理顏色並開啟自動清理，確保畫面不殘留黑影
+          gl.setClearColor('#F0F9FF', 0);
+          gl.autoClear = true;
+        }}
+        style={{ width: '100%', height: '100%' }}
+        resize={{ scroll: false, debounce: 0 }}
+      >
         
-        {/* ✅ 加入尺寸控制器 */}
         <CanvasSizeController isShrunken={isShrunken} />
         
         <Environment preset="city" blur={0.8} />
         <ambientLight intensity={0.8} />       
+        
         <directionalLight 
-  position={[10, 20, 10]} 
-  intensity={2.5} 
-  color="#ffffff" 
-  castShadow 
-  shadow-bias={-0.0005} // 新增這行：防止陰影條紋與閃爍
-/>
+          position={[10, 20, 10]} 
+          intensity={2.5} 
+          color="#ffffff" 
+          castShadow 
+          // 修正點 4: 稍微加大 bias 避免 iOS 上的陰影條紋閃爍
+          shadow-bias={-0.001} 
+        />
+
         <SpotLight
           position={[-20, 10, -10]}
           angle={0.5}
@@ -115,14 +121,15 @@ export default function Home3DView({ onRegionSelect, isLocked = false, isShrunke
           </Float>
         </Suspense>
 
+        {/* 修正點 5: 調整陰影位置與模糊度，防止與模型產生深度衝突 (Z-fighting) */}
         <ContactShadows 
-  position={[0, -6, 0]}
-  opacity={0.3}
-  blur={3}
-  scale={40} 
-  far={15} 
-  color="#1e293b" 
-/>
+          position={[0, -6.5, 0]}
+          opacity={0.3}
+          blur={3.5}
+          scale={45} 
+          far={20} 
+          color="#1e293b" 
+        />
         
         <Sparkles count={40} scale={20} size={4} speed={0.4} opacity={0.5} color="#FF8A65" position={[0, 0, 5]} />
         
