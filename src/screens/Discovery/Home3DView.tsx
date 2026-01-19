@@ -123,12 +123,12 @@ export default function Home3DView({ onRegionSelect, isLocked = false, isShrunke
               position={[1, 0, -2]} 
               rotation={[0.18, -6.7, 0]} 
             />
+            
+            {/* ✅ 測試 10（最終測試）：加回 InteractiveRegion */}
+            <InteractiveRegion position={[4.5, 7, -10]} label="北部熱區" onClick={() => onRegionSelect?.('north')} />
+            <InteractiveRegion position={[0, 5, .05]} label="中部熱區" onClick={() => onRegionSelect?.('center')} />
+            <InteractiveRegion position={[-2, 4.5, 9]} label="南部熱區" onClick={() => onRegionSelect?.('south')} />
           </Float>
-          
-          {/* ❌ InteractiveRegion 還不要加 */}
-          {/* <InteractiveRegion position={[4.5, 7, -10]} label="北部熱區" onClick={() => onRegionSelect?.('north')} />
-          <InteractiveRegion position={[0, 5, .05]} label="中部熱區" onClick={() => onRegionSelect?.('center')} />
-          <InteractiveRegion position={[-2, 4.5, 9]} label="南部熱區" onClick={() => onRegionSelect?.('south')} /> */}
         </Suspense>
 
         <ContactShadows 
@@ -140,9 +140,6 @@ export default function Home3DView({ onRegionSelect, isLocked = false, isShrunke
           color="#1e293b" 
         />
         
-        {/* ❌ Sparkles 已永久移除 */}
-        
-        {/* ✅ 測試 9：加回 OrbitControls */}
         <OrbitControls 
           enableZoom={true} 
           enablePan={false} 
