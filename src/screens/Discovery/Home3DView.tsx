@@ -83,8 +83,8 @@ export default function Home3DView({ onRegionSelect, isLocked = false, isShrunke
         }}
         resize={{ scroll: false, debounce: 0 }}
       >
-        {/* ✅ 測試 A：註解掉 CanvasSizeController */}
-        {/* <CanvasSizeController isShrunken={isShrunken} /> */}
+        
+       <CanvasSizeController isShrunken={isShrunken} />
         
         {/* ✅ 只保留最基本的光源 */}
         <ambientLight intensity={1.2} />
