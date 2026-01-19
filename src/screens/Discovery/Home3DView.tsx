@@ -54,7 +54,7 @@ export default function Home3DView({ onRegionSelect, isLocked = false, isShrunke
     <div 
       className="w-full h-[650px] relative rounded-[2rem] overflow-hidden touch-none"
       style={{
-        backgroundColor: '#ffffff',
+        backgroundColor: 'transparent',  // ✅ 改回透明
         transform: 'translate3d(0, 0, 0)',
         WebkitTransform: 'translate3d(0, 0, 0)',
         isolation: 'isolate',
@@ -85,7 +85,6 @@ export default function Home3DView({ onRegionSelect, isLocked = false, isShrunke
       >
         <CanvasSizeController isShrunken={isShrunken} />
         
-        {/* ✅ 測試 6：加回所有光源 */}
         <ambientLight intensity={1.2} />
         
         <hemisphereLight 
@@ -133,8 +132,8 @@ export default function Home3DView({ onRegionSelect, isLocked = false, isShrunke
           <InteractiveRegion position={[-2, 4.5, 9]} label="南部熱區" onClick={() => onRegionSelect?.('south')} /> */}
         </Suspense>
 
-        {/* ❌ 陰影和特效還不要加 */}
-        {/* <ContactShadows 
+        {/* ✅ 測試 7：加回 ContactShadows */}
+        <ContactShadows 
           position={[0, -6.5, 0]}
           opacity={0.3}
           blur={3.5}
@@ -143,7 +142,8 @@ export default function Home3DView({ onRegionSelect, isLocked = false, isShrunke
           color="#1e293b" 
         />
         
-        <Sparkles count={40} scale={20} size={4} speed={0.4} opacity={0.5} color="#FF8A65" position={[0, 0, 5]} />
+        {/* ❌ Sparkles 和 OrbitControls 還不要加 */}
+        {/* <Sparkles count={40} scale={20} size={4} speed={0.4} opacity={0.5} color="#FF8A65" position={[0, 0, 5]} />
         
         <OrbitControls 
           enableZoom={true} 
