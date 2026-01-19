@@ -3,7 +3,6 @@ import { Canvas } from '@react-three/fiber'
 import { 
   OrbitControls, 
   Float, 
-  Sparkles,
   ContactShadows,
   SpotLight,
   Html 
@@ -141,11 +140,10 @@ export default function Home3DView({ onRegionSelect, isLocked = false, isShrunke
           color="#1e293b" 
         />
         
-        {/* ✅ 測試 8：加回 Sparkles */}
-        <Sparkles count={40} scale={20} size={4} speed={0.4} opacity={0.5} color="#FF8A65" position={[0, 0, 5]} />
+        {/* ❌ Sparkles 已永久移除 */}
         
-        {/* ❌ OrbitControls 還不要加 */}
-        {/* <OrbitControls 
+        {/* ✅ 測試 9：加回 OrbitControls */}
+        <OrbitControls 
           enableZoom={true} 
           enablePan={false} 
           enabled={!isLocked}
@@ -153,7 +151,7 @@ export default function Home3DView({ onRegionSelect, isLocked = false, isShrunke
           maxPolarAngle={Math.PI / 2.2}
           minAzimuthAngle={-Math.PI / 4}
           maxAzimuthAngle={Math.PI / 4}
-        /> */}
+        />
       </Canvas>
     </div>
   )
