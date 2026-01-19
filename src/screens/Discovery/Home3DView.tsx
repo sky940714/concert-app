@@ -70,21 +70,19 @@ export default function Home3DView({ onRegionSelect, isLocked = false, isShrunke
         // ✅ 測試版本 B: 加入 frameloop 控制
         frameloop="always"
         gl={{ 
-          antialias: true, 
-          alpha: false,
-          powerPreference: "high-performance",
-          depth: true,
-          stencil: false,
-          preserveDrawingBuffer: false,
-          failIfMajorPerformanceCaveat: false,
-        }}
+            antialias: true, 
+            alpha: true, // 必須為 true 才能與底層背景融合
+            powerPreference: "high-performance",
+            stencil: false,
+            depth: true,
+            premultipliedAlpha: false, // 防止 iOS 渲染邊緣黑邊
+            }}
         onCreated={({ gl }) => {
-          gl.setClearColor('#F0F9FF', 1);
-          gl.autoClear = true;
-          gl.outputColorSpace = 'srgb';
-          // ✅ iOS 專用:限制 pixel ratio
-          gl.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        }}
+            gl.setClearColor(0x000000, 0); // 設定為完全透明，讓 ConcertAtmosphereBackground 透出
+            gl.autoClear = true;
+            gl.outputColorSpace = 'srgb';
+            gl.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            }}
         style={{ 
           width: '100%', 
           height: '100%',

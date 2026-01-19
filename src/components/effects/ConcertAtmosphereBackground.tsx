@@ -6,6 +6,8 @@ const styles = `
     0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
     33% { transform: translate3d(30px, -50px, 0) rotate(5deg); }
     66% { transform: translate3d(-20px, 20px, 0) rotate(-5deg); }
+    .filter.blur-\[100px\] { filter: blur(60px); }
+    .filter.blur-\[110px\] { filter: blur(60px); }
   }
   @keyframes float-medium {
     0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
@@ -24,11 +26,13 @@ const styles = `
     100% { transform: translateX(100vw); opacity: 0; }
   }
   .animate-float-slow { 
-    animation: float-slow 20s ease-in-out infinite;
-    /* iOS 專用優化 */
-    -webkit-transform: translate3d(0, 0, 0);
-    will-change: transform;
-  }
+  animation: float-slow 20s ease-in-out infinite;
+  -webkit-transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0);
+  will-change: transform;
+  -webkit-backface-visibility: hidden; // 強制 iOS 鎖定圖層
+  backface-visibility: hidden;
+}
   .animate-float-medium { 
     animation: float-medium 15s ease-in-out infinite;
     /* iOS 專用優化 */
