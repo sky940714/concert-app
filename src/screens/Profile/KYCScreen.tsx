@@ -1,105 +1,253 @@
-import { useState } from 'react';
-import { ArrowLeft, Fingerprint, Camera, Upload, ScanLine, CheckCircle2 } from 'lucide-react';
-// 我們直接使用新的 CSS class，不再依賴舊的 GlassCard
-import { MOCK_USER } from '../../data';
+import { useState, useRef, useEffect } from 'react';
+import { 
+  ArrowLeft, 
+  ScanFace, 
+  FileCheck, 
+  Smile, 
+  CheckCircle2, 
+  Loader2, 
+  ShieldCheck, 
+  Camera 
+} from 'lucide-react';
+
+type Step = 
+  | 'intro'           
+  | 'scan-front'      
+  | 'scan-back'       
+  | 'liveness-intro'  
+  | 'liveness-action' 
+  | 'submitting'      
+  | 'pending';        
 
 interface KYCScreenProps {
+  onComplete: (success: boolean) => void;
   onBack: () => void;
-  onSuccess: () => void;
-  showToast: (msg: string) => void;
 }
 
-export const KYCScreen = ({ onBack, onSuccess, showToast }: KYCScreenProps) => {
+export function KYCScreen({ onComplete, onBack }: KYCScreenProps) {
+  const [step, setStep] = useState<Step>('intro');
   const [isScanning, setIsScanning] = useState(false);
+  const [scanProgress, setScanProgress] = useState(0);
+  const [captured, setCaptured] = useState(false);
+  const [livenessDone, setLivenessDone] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [livenessAction, setLivenessAction] = useState('準備開始辨識');
 
-  const startScan = () => {
-    setIsScanning(true);
-    setTimeout(() => {
-      setIsScanning(false);
-      onSuccess();
-    }, 3500);
+  // 定義演示用的變數
+  const isLiveness = step === 'liveness-intro' || step === 'liveness-action';
+  // 增加底部邊距，確保高於導覽列 (BottomTabBar 在 bottom-6 左右)
+  const safeBottomClass = "pb-32"; 
+
+  const startCamera = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { facingMode: step === 'liveness-action' ? 'user' : 'environment' }
+      });
+      if (videoRef.current) videoRef.current.srcObject = stream;
+    } catch (err) {
+      console.warn("相機啟動失敗，切換至演示模式背景", err);
+    }
   };
 
+  const stopCamera = () => {
+    if (videoRef.current && videoRef.current.srcObject) {
+      (videoRef.current.srcObject as MediaStream).getTracks().forEach(track => track.stop());
+      videoRef.current.srcObject = null;
+    }
+  };
+
+  useEffect(() => {
+    if (['scan-front', 'scan-back', 'liveness-action'].includes(step)) {
+      startCamera();
+    } else {
+      stopCamera();
+    }
+    return () => stopCamera();
+  }, [step]);
+
+  // 模擬自動掃描流程 (演示用)
+  const handleFakeScan = () => {
+    setIsScanning(true);
+    setScanProgress(0);
+    const interval = setInterval(() => {
+      setScanProgress(prev => {
+        if (prev >= 100) {
+          clearInterval(interval);
+          setIsScanning(false);
+          setCaptured(true);
+          return 100;
+        }
+        return prev + 2; // 稍微調慢讓演示更有感
+      });
+    }, 40);
+  };
+
+  const handleSubmit = () => {
+    setStep('submitting');
+    setTimeout(() => setStep('pending'), 2000);
+  };
+
+  // 1. 服務條款頁面 (Intro)
+  if (step === 'intro') {
+    return (
+      <div className="h-full bg-[#F0F9FF] flex flex-col p-8 pt-16 font-sans relative">
+        <button onClick={onBack} className="absolute top-6 left-6 p-2 bg-white rounded-full shadow-sm">
+          <ArrowLeft size={20} className="text-slate-600"/>
+        </button>
+        <div className="flex-1 flex flex-col items-center justify-center text-center pb-20">
+          <div className="w-20 h-20 bg-white rounded-[1.5rem] shadow-lg flex items-center justify-center mb-8 animate-pulse shrink-0">
+             <ShieldCheck size={40} className="text-indigo-500" />
+          </div>
+          <h2 className="text-2xl font-black text-slate-700 mb-6 tracking-tighter">實名認證</h2>
+          <div className="bg-white/60 backdrop-blur-sm p-6 rounded-[2rem] border border-white/50 text-left space-y-4 shadow-sm w-full max-w-xs">
+             <div className="flex gap-4 items-center">
+                <FileCheck size={20} className="text-indigo-600 shrink-0"/>
+                <p className="text-sm text-slate-500 font-bold">準備身分證正反面照片</p>
+             </div>
+             <div className="flex gap-4 items-center">
+                <Smile size={20} className="text-indigo-600 shrink-0"/>
+                <p className="text-sm text-slate-500 font-bold">需進行本人臉部活體辨識</p>
+             </div>
+          </div>
+
+          {/* 下一步按鈕：放在內容中間，且位置絕對高於導覽列 */}
+          <div className="mt-10 w-full max-w-xs">
+            <button 
+              onClick={() => setStep('scan-front')}
+              className="w-full bg-[#FF8A65] text-white font-black py-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 active:scale-95 transition-all"
+            >
+              下一步：開始掃描 <ArrowLeft className="rotate-180" size={18} strokeWidth={4}/>
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // 5. 提交與結果頁面
+  if (step === 'submitting' || step === 'pending') {
+    return (
+      <div className="h-full bg-[#F0F9FF] flex flex-col items-center justify-center p-8 text-center">
+        {step === 'submitting' ? (
+          <>
+            <Loader2 className="w-16 h-16 text-indigo-500 animate-spin mb-4" />
+            <h3 className="text-xl font-black text-slate-700">正在安全上傳資料...</h3>
+          </>
+        ) : (
+          <div className="animate-in fade-in zoom-in">
+            <CheckCircle2 size={60} className="text-emerald-500 mx-auto mb-6" />
+            <h2 className="text-2xl font-black text-slate-700 mb-4">申請已提交</h2>
+            <p className="text-slate-500 font-bold mb-12">審核預計需 1-3 個工作天</p>
+            <button onClick={onBack} className="w-full bg-slate-800 text-white font-black py-4 rounded-2xl shadow-xl active:scale-95 transition-all">
+              回到個人首頁
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // 2-4 相機與辨識流程
   return (
-    <div className="pb-20 px-6 pt-12 bg-[#E0F7FA] h-[100dvh] overflow-y-auto font-sans text-slate-600 animate-in slide-in-from-right">
-      
-      {/* 頂部導航 */}
-      <div className="flex items-center gap-4 mb-8">
-        <button 
-          onClick={onBack} 
-          className="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-slate-400 hover:text-[#FF8A65] active:scale-90 transition-all"
-        >
-          <ArrowLeft size={20} strokeWidth={3} />
-        </button>
-        <h2 className="text-2xl font-black text-slate-700 clay-text-title tracking-tight">身分驗證</h2>
+    <div className="h-full bg-slate-900 relative flex flex-col overflow-hidden font-sans">
+      {/* 假裝有相機畫面：即使啟動失敗也會有漸層背景 */}
+      <div className="absolute inset-0 bg-gradient-to-b from-slate-800 to-black">
+        <video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-cover opacity-60" />
       </div>
       
-      <div className="space-y-6 relative">
-        {/* 表單主卡片 */}
-        <div className="clay-card-white p-6 pb-8">
-          {isScanning && (
-            <div className="absolute inset-0 bg-white/80 z-20 backdrop-blur-sm rounded-[2rem] flex flex-col items-center justify-center animate-in fade-in">
-              <div className="w-20 h-20 bg-[#E0F7FA] rounded-full flex items-center justify-center mb-4 relative overflow-hidden clay-inset">
-                <ScanLine className="text-[#FF8A65] animate-bounce" size={32} strokeWidth={3} />
-                <div className="absolute top-0 w-full h-1 bg-[#FF8A65]/50 animate-[scan_2s_linear_infinite]" />
+      <button onClick={onBack} className="absolute top-10 left-6 z-30 p-2 bg-white/20 backdrop-blur-md rounded-full text-white">
+        <ArrowLeft size={20}/>
+      </button>
+
+      <div className="absolute inset-0 z-10 flex flex-col items-center justify-between py-24 pointer-events-none">
+         <div className="text-center bg-black/60 backdrop-blur-xl px-8 py-2 rounded-full border border-white/20">
+            <h3 className="text-white font-black text-xs tracking-widest uppercase">
+              {step === 'scan-front' ? "ID FRONT SCAN" : step === 'scan-back' ? "ID BACK SCAN" : "FACIAL VERIFY"}
+            </h3>
+         </div>
+         
+         {/* 掃描框 */}
+         <div className={`relative border-2 border-white/40 shadow-[0_0_0_9999px_rgba(0,0,0,0.7)] transition-all duration-700 ${isLiveness ? 'w-64 h-64 rounded-full' : 'w-80 h-52 rounded-[2rem]'}`}>
+            {(isScanning || step === 'liveness-action') && (
+                <div className="absolute top-0 left-0 w-full h-1 bg-cyan-400 shadow-[0_0_20px_rgba(34,211,238,1)] animate-scanner" />
+            )}
+            {isScanning && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-[2rem]">
+                   <span className="text-cyan-400 font-mono font-black text-3xl">{scanProgress}%</span>
+                </div>
+            )}
+            {livenessDone && (
+              <div className="absolute inset-0 flex items-center justify-center bg-emerald-500/20 rounded-full">
+                <CheckCircle2 size={48} className="text-emerald-400 animate-in zoom-in" />
               </div>
-              <p className="font-black text-slate-600 animate-pulse">生物特徵比對中...</p>
-            </div>
-          )}
+            )}
+         </div>
 
-          <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2 pl-1">
-            <Fingerprint size={14} className="inline mr-1 -mt-0.5 text-[#99E6D9]" strokeWidth={3}/>
-            真實姓名
-          </label>
-          <input 
-            type="text" 
-            defaultValue={MOCK_USER.name} 
-            className="clay-inset w-full p-4 text-slate-700 font-bold rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#99E6D9]/50 mb-6" 
-          />
-          
-          <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2 pl-1">
-            身分證字號
-          </label>
-          <input 
-            type="text" 
-            placeholder="A123456789" 
-            className="clay-inset w-full p-4 text-slate-700 font-bold rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#99E6D9]/50" 
-          />
-        </div>
-
-        {/* 上傳按鈕區：改為浮島按鈕 */}
-        <div className="grid grid-cols-2 gap-4">
-          <button 
-            onClick={() => showToast("模擬：啟動相機模組...")} 
-            className="bg-[#B2F2E8] p-5 rounded-3xl shadow-[4px_4px_10px_rgba(178,242,232,0.6)] flex flex-col items-center justify-center gap-2 group active:scale-95 transition-all h-36"
-          >
-            <div className="w-12 h-12 bg-white/50 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-              <Camera size={24} className="text-teal-700" strokeWidth={3} />
-            </div>
-            <span className="text-xs font-black text-teal-800">拍攝證件</span>
-          </button>
-          
-          <button 
-            onClick={() => showToast("模擬：開啟檔案總管...")} 
-            className="bg-[#FFCC80] p-5 rounded-3xl shadow-[4px_4px_10px_rgba(255,204,128,0.6)] flex flex-col items-center justify-center gap-2 group active:scale-95 transition-all h-36"
-          >
-            <div className="w-12 h-12 bg-white/50 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-              <Upload size={24} className="text-orange-800" strokeWidth={3} />
-            </div>
-            <span className="text-xs font-black text-orange-800">上傳檔案</span>
-          </button>
-        </div>
-
-        {/* 提交按鈕：Q彈糖果 */}
-        <button 
-          onClick={startScan}
-          disabled={isScanning}
-          className="clay-btn-orange w-full py-4 rounded-2xl flex items-center justify-center gap-2 shadow-xl mt-4 active:scale-95 disabled:opacity-50 disabled:active:scale-100 transition-all"
-        >
-          {isScanning ? '處理中...' : '啟動驗證程序'}
-          {!isScanning && <CheckCircle2 size={18} strokeWidth={3} />}
-        </button>
+         <div className="px-10 text-center">
+            <p className="text-white font-bold text-sm bg-black/30 backdrop-blur-md px-6 py-2 rounded-full">
+                {isLiveness ? livenessAction : "請將證件置於框內"}
+            </p>
+         </div>
       </div>
+
+      {/* 底部按鈕控制區：使用 pb-40 確保完全避開導覽列 */}
+      <div className="absolute bottom-0 w-full px-10 z-20 flex justify-center pb-32 bg-gradient-to-t from-black to-transparent">
+         {captured && !isScanning ? (
+           <button 
+             onClick={() => { 
+                setCaptured(false); 
+                if (step === 'scan-front') setStep('scan-back'); 
+                else setStep('liveness-intro'); 
+             }}
+             className="w-full bg-[#FF8A65] text-white font-black py-4 rounded-2xl flex items-center justify-center gap-2 shadow-xl shadow-orange-500/30 animate-in slide-in-from-bottom-4"
+           >
+             確認並繼續 <ArrowLeft className="rotate-180" size={18} strokeWidth={4}/>
+           </button>
+         ) : step === 'liveness-intro' ? (
+            <button 
+              onClick={() => { 
+                setStep('liveness-action'); 
+                setLivenessAction('請眨眨眼...');
+                setTimeout(() => {
+                  setLivenessAction('請緩慢向左轉頭...');
+                  setTimeout(() => {
+                    setLivenessAction('驗證完成');
+                    setLivenessDone(true);
+                  }, 2000);
+                }, 2000);
+              }}
+              className="w-full bg-indigo-500 text-white font-black py-4 rounded-2xl shadow-xl shadow-indigo-500/40"
+            >
+              開始本人驗證
+            </button>
+         ) : livenessDone ? (
+            <button 
+              onClick={handleSubmit}
+              className="w-full bg-emerald-500 text-white font-black py-4 rounded-2xl shadow-xl animate-pulse"
+            >
+              提交資料審核
+            </button>
+         ) : !isScanning && (
+            <button 
+              onClick={handleFakeScan} 
+              className="w-20 h-20 rounded-full border-4 border-white flex items-center justify-center active:scale-90 transition-all shadow-2xl"
+            >
+              <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center">
+                <Camera size={26} className="text-slate-900" />
+              </div>
+            </button>
+         )}
+      </div>
+
+      <style>{`
+        @keyframes scanner {
+          0% { top: 0%; opacity: 0; }
+          10% { opacity: 1; }
+          90% { opacity: 1; }
+          100% { top: 100%; opacity: 0; }
+        }
+        .animate-scanner { animation: scanner 2.5s linear infinite; }
+      `}</style>
     </div>
   );
-};
+}

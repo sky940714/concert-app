@@ -1,114 +1,164 @@
-import { Ticket, Hotel, Utensils, Map, MapPin, ExternalLink, Grid, Navigation } from 'lucide-react';
-// 移除舊的 GlassCard，我們現在直接寫 div className
-// import { GlassCard } from '../../components/common'; 
+import { useState } from 'react';
+import { 
+  Navigation2, 
+  MapPin, 
+  Utensils, 
+  Train, 
+  ExternalLink,
+  Ticket,
+  Bed,
+  Compass
+} from 'lucide-react';
 
-interface NearbyHubProps {
-  showToast: (msg: string) => void;
+interface Venue {
+  id: number;
+  name: string;
+  distance: string;
+  category: string;
+  address: string;
+  coords: { lat: number; lng: number };
+  status: 'busy' | 'normal' | 'quiet';
+  type: 'venue' | 'hotel' | 'food';
 }
 
-export const NearbyHub = ({ showToast }: NearbyHubProps) => {
-  const navItems = [
-    { 
-      icon: <Ticket size={28} strokeWidth={3} className="text-white" />, 
-      label: "官方購票", 
-      desc: "前往售票系統", 
-      // 這裡改用我們定義好的 CSS class，不再用 gradient
-      iconBg: "clay-card-mint" 
-    },
-    { 
-      icon: <Hotel size={28} strokeWidth={3} className="text-white" />, 
-      label: "附近旅宿", 
-      desc: "預訂周邊住宿", 
-      iconBg: "bg-[#FFAB91] shadow-[4px_4px_8px_rgba(255,171,145,0.4),inset_-2px_-2px_4px_rgba(0,0,0,0.1),inset_2px_2px_4px_rgba(255,255,255,0.4)]" 
-    },
-    { 
-      icon: <Utensils size={28} strokeWidth={3} className="text-white" />, 
-      label: "美食大全", 
-      desc: "探索在地美食", 
-      iconBg: "bg-[#FFCC80] shadow-[4px_4px_8px_rgba(255,204,128,0.4),inset_-2px_-2px_4px_rgba(0,0,0,0.1),inset_2px_2px_4px_rgba(255,255,255,0.4)]" 
+const VENUES: Venue[] = [
+  { 
+    id: 1, 
+    name: '臺北小巨蛋', 
+    distance: '250m', 
+    category: '熱門場館', 
+    address: '台北市南京東路四段2號',
+    coords: { lat: 25.051, lng: 121.550 },
+    status: 'busy',
+    type: 'venue'
+  },
+  { 
+    id: 2, 
+    name: '南京復興附近旅宿', 
+    distance: '800m', 
+    category: '精選住宿', 
+    address: '台北市南京東路三段沿線',
+    coords: { lat: 25.052, lng: 121.544 },
+    status: 'normal',
+    type: 'hotel'
+  },
+  { 
+    id: 3, 
+    name: '場館周邊美食', 
+    distance: '150m', 
+    category: '人氣餐廳', 
+    address: '南京東路美食商圈',
+    coords: { lat: 25.051, lng: 121.547 },
+    status: 'quiet',
+    type: 'food'
+  }
+];
+
+export const NearbyHub = () => {
+  const [filter, setFilter] = useState('全部');
+
+  // 統一外部跳轉邏輯
+  const handleAction = (venue: Venue) => {
+    switch (venue.type) {
+      case 'venue':
+        window.open('https://kktix.com/', '_blank');
+        break;
+      case 'hotel':
+        window.open('https://www.trip.com/', '_blank');
+        break;
+      case 'food':
+        window.open('https://www.ubereats.com/tw', '_blank');
+        break;
+      default:
+        break;
     }
-  ];
+  };
+
+  const openGoogleMaps = (venue: Venue) => {
+    const url = `https://www.google.com/maps/dir/?api=1&destination=${venue.coords.lat},${venue.coords.lng}`;
+    window.open(url, '_blank');
+  };
 
   return (
-    <div className="pb-32 px-6 pt-12 bg-[#E0F7FA] h-[100dvh] overflow-y-auto no-scrollbar font-sans">
-      
-      {/* 標題區：深灰色圓體字 + 珊瑚橘裝飾 */}
-      <div className="mb-8 pl-2">
-        <h1 className="text-3xl font-black mb-2 tracking-tight flex items-center gap-3 text-slate-700 clay-text-title">
-          <div className="bg-white p-2.5 rounded-2xl shadow-sm">
-            <Navigation className="text-[#FF8A65] animate-bounce-slow" size={28} strokeWidth={3} /> 
-          </div>
-          附近導航
+    <div className="h-full bg-[#F0F9FF] flex flex-col font-sans overflow-hidden">
+      {/* 頂部標題 */}
+      <div className="pt-16 pb-6 px-8 bg-white/40 backdrop-blur-md shrink-0">
+        <h1 className="text-2xl font-black text-slate-700 tracking-tight flex items-center gap-2">
+          <Compass className="text-[#FF8A65]" /> 附近導航
         </h1>
-        <p className="text-slate-400 text-sm font-bold tracking-wide ml-1">
-          探索場館周邊的服務據點
-        </p>
+        <p className="text-slate-400 text-xs font-bold mt-1">探索演唱會場館周邊</p>
       </div>
-      
-      {/* 導航卡片列表 */}
-      <div className="grid gap-5 mb-10">
-        {navItems.map((item, idx) => (
-          <div 
-            key={idx} 
-            onClick={() => showToast(`正在導航至${item.label}...`)} 
-            className="clay-card-white p-2 cursor-pointer group active:scale-[0.98] transition-all duration-200"
-          >
-            {/* 卡片內容 */}
-            <div className="bg-white rounded-[1.8rem] p-4 flex items-center justify-between relative overflow-hidden">
-              <div className="flex items-center gap-5 relative z-10">
-                {/* 圖標容器：各色黏土塊 */}
-                <div className={`w-16 h-16 rounded-2xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3 ${item.iconBg}`}>
-                  {item.icon}
-                </div>
-                
-                <div>
-                  <h3 className="text-xl font-black text-slate-700">{item.label}</h3>
-                  <p className="text-slate-400 text-sm font-bold mt-1">{item.desc}</p>
-                </div>
-              </div>
 
-              {/* 右側按鈕：Q彈小圓 */}
-              <div className="w-10 h-10 rounded-full bg-[#E0F7FA] flex items-center justify-center text-[#FF8A65] shadow-inner group-hover:bg-[#FF8A65] group-hover:text-white transition-colors duration-300">
-                <ExternalLink size={20} strokeWidth={3} />
-              </div>
-            </div>
-          </div>
+      {/* 橫向滑動分類按鈕 */}
+      <div className="flex gap-3 px-8 py-4 overflow-x-auto no-scrollbar shrink-0">
+        {['全部', '官方購票', '附近旅宿', '美食大全'].map((item) => (
+          <button
+            key={item}
+            onClick={() => setFilter(item)}
+            className={`px-6 py-2 rounded-full text-[10px] font-black tracking-widest transition-all whitespace-nowrap ${
+              filter === item 
+              ? 'bg-slate-800 text-white shadow-lg' 
+              : 'bg-white text-slate-400 border border-white'
+            }`}
+          >
+            {item}
+          </button>
         ))}
       </div>
 
-      {/* 地圖區域：壓入式凹槽 (Inset) */}
-      <div className="px-1">
-        <h2 className="text-sm font-black text-slate-400 mb-4 tracking-widest uppercase flex items-center gap-2">
-          <Map size={14} strokeWidth={3} /> 詳細地圖
-        </h2>
-
-        <div 
-          onClick={() => showToast("載入詳細地圖...")} 
-          className="clay-inset h-56 w-full relative overflow-hidden cursor-pointer group flex items-center justify-center transition-all hover:shadow-[inset_2px_2px_5px_rgba(0,0,0,0.05),inset_-2px_-2px_5px_rgba(255,255,255,1)]"
-        >
-          {/* 網格背景：改為深灰線條，模擬製圖紙質感 */}
+      {/* 場館列表區 */}
+      <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4 no-scrollbar pb-40">
+        {VENUES.map((venue) => (
           <div 
-            className="absolute inset-0 opacity-10" 
-            style={{ 
-              backgroundImage: 'linear-gradient(#94A3B8 2px, transparent 2px), linear-gradient(90deg, #94A3B8 2px, transparent 2px)', 
-              backgroundSize: '30px 30px' 
-            }}
-          />
-          
-          {/* 地圖中心圖標 */}
-          <div className="relative z-10 flex flex-col items-center gap-3">
-            <div className="bg-white p-4 rounded-full shadow-[0_8px_16px_rgba(0,0,0,0.1)] group-hover:scale-110 transition-transform duration-300">
-              <Grid size={32} className="text-[#99E6D9]" strokeWidth={2.5} />
+            key={venue.id}
+            className="bg-white/60 backdrop-blur-sm rounded-[2rem] p-6 border border-white/50 shadow-sm active:scale-[0.98] transition-all"
+          >
+            <div className="flex justify-between items-start mb-4">
+              <div className="flex items-center gap-3">
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                  venue.type === 'venue' ? 'bg-orange-50 text-[#FF8A65]' : 
+                  venue.type === 'hotel' ? 'bg-indigo-50 text-indigo-500' : 'bg-emerald-50 text-emerald-500'
+                }`}>
+                  {venue.type === 'venue' && <Ticket size={20} />}
+                  {venue.type === 'hotel' && <Bed size={20} />}
+                  {venue.type === 'food' && <Utensils size={20} />}
+                </div>
+                <div>
+                  <h3 className="text-sm font-black text-slate-700">{venue.name}</h3>
+                  <p className="text-[10px] text-slate-400 font-bold">{venue.category} · {venue.distance}</p>
+                </div>
+              </div>
+              <div className={`px-2 py-1 rounded-lg text-[8px] font-black uppercase tracking-tighter ${
+                venue.status === 'busy' ? 'bg-rose-100 text-rose-500' : 'bg-emerald-100 text-emerald-500'
+              }`}>
+                {venue.status === 'busy' ? '擁擠' : '快適'}
+              </div>
             </div>
-            <div className="bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full text-xs font-black text-slate-600 shadow-sm flex items-center gap-2 group-hover:text-[#FF8A65] transition-colors">
-              <MapPin size={14} strokeWidth={3} /> 點擊展開全螢幕
+
+            <div className="grid grid-cols-2 gap-3 mt-6">
+              {/* 導航按鈕：開啟 Google Maps */}
+              <button 
+                onClick={() => openGoogleMaps(venue)}
+                className="bg-white text-slate-700 border border-slate-100 font-black text-[10px] py-4 rounded-xl flex items-center justify-center gap-2 shadow-sm active:bg-slate-50 transition-colors"
+              >
+                <Navigation2 size={14} className="text-indigo-500" /> 導航前往
+              </button>
+
+              {/* 外部連結按鈕：根據類型跳轉 */}
+              <button 
+                onClick={() => handleAction(venue)}
+                className="bg-slate-800 text-white font-black text-[10px] py-4 rounded-xl flex items-center justify-center gap-2 shadow-md active:scale-95 transition-all"
+              >
+                {venue.type === 'venue' ? '官方購票' : venue.type === 'hotel' ? '即刻預訂' : '叫外送'}
+                <ExternalLink size={12} />
+              </button>
             </div>
           </div>
-
-          {/* 裝飾性光暈 */}
-          <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-[#99E6D9]/20 rounded-full blur-2xl pointer-events-none" />
-          <div className="absolute -top-10 -left-10 w-32 h-32 bg-[#FF8A65]/10 rounded-full blur-2xl pointer-events-none" />
-        </div>
+        ))}
+        
+        <p className="text-center text-[10px] font-black text-slate-300 tracking-[0.2em] py-4">
+          END OF LIST
+        </p>
       </div>
     </div>
   );

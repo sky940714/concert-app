@@ -7,17 +7,17 @@ import {
   Sparkles,
   ContactShadows,
   SpotLight,
-  Html      // 👈 修正 1：這裡補上了逗號
+  Html 
 } from '@react-three/drei'
 import { Model as TaiwanModel } from '../../components/models/Taiwan-island'
+import { CanvasSizeController } from '../../components/effects' // ✅ 引入
 
-// 定義 Props
 interface Home3DViewProps {
   onRegionSelect?: (regionId: 'north' | 'center' | 'south') => void;
-  isLocked?: boolean; // 👈 新增這個控制開關
+  isLocked?: boolean;
+  isShrunken?: boolean; // ✅ 新增 prop
 }
 
-// 互動熱點 (保留您原本的設定)
 const InteractiveRegion = ({ position, onClick, label }: { position: [number, number, number], onClick: () => void, label: string }) => {
   const [hovered, setHovered] = useState(false);
   
@@ -50,11 +50,22 @@ const InteractiveRegion = ({ position, onClick, label }: { position: [number, nu
   )
 }
 
-export default function Home3DView({ onRegionSelect, isLocked = false }: Home3DViewProps) {
+export default function Home3DView({ onRegionSelect, isLocked = false, isShrunken = false }: Home3DViewProps) {
   return (
-    <div className="w-full h-[650px] relative rounded-[2rem] overflow-hidden">
-      <Canvas camera={{ position: [0, 25, 30], fov: 50 }} shadows>        
-        <fog attach="fog" args={['#F0F9FF', 20, 90]} />
+    <div className="w-full h-[650px] relative rounded-[2rem] overflow-hidden touch-none">
+      
+      <Canvas 
+        camera={{ position: [0, 25, 30], fov: 50 }} 
+        shadows
+        // ✅ 確保 Canvas 使用完整容器尺寸
+        style={{ width: '100%', height: '100%' }}
+        // ✅ 重要:防止 Canvas 內部錯誤調整尺寸
+        resize={{ scroll: false, debounce: 0 }}
+      >        
+        
+        {/* ✅ 加入尺寸控制器 */}
+        <CanvasSizeController isShrunken={isShrunken} />
+        
         <Environment preset="city" blur={0.8} />
         <ambientLight intensity={0.8} />       
         <directionalLight 
@@ -69,50 +80,30 @@ export default function Home3DView({ onRegionSelect, isLocked = false }: Home3DV
           attenuation={5}
           anglePower={5}
           intensity={10} 
-          color="#BAE6FD" // 冷藍光，呼應背景
+          color="#BAE6FD" 
         />
         <pointLight position={[-10, 0, 10]} intensity={1} color="#FFD180" />
+        
         <Suspense fallback={null}>
           <Float 
             speed={2} 
-            rotationIntensity={0.1} // 微幅旋轉，增加生動感
+            rotationIntensity={0.1} 
             floatIntensity={0.5} 
             floatingRange={[-0.5, 0.5]}
           >
-            {/* 模型本體 (保留您的座標與角度) */}
             <TaiwanModel 
                 scale={18} 
                 position={[1, 0, -2]} 
                 rotation={[0.18, -6.7, 0]} 
             />
 
-            {/* === 3. 互動熱區 (保留您辛苦微調好的座標) === */}
-            {/* 北部 */}
-            <InteractiveRegion 
-              position={[4.5, 7, -10]} 
-              label="北部熱區"
-              onClick={() => onRegionSelect?.('north')} 
-            />
-            
-            {/* 中部 */}
-            <InteractiveRegion 
-              position={[0, 5, .05]} 
-              label="中部熱區"
-              onClick={() => onRegionSelect?.('center')} 
-            />
-
-            {/* 南部 */}
-            <InteractiveRegion 
-              position={[-2, 4.5, 9]} 
-              label="南部熱區"
-              onClick={() => onRegionSelect?.('south')} 
-            />
+            <InteractiveRegion position={[4.5, 7, -10]} label="北部熱區" onClick={() => onRegionSelect?.('north')} />
+            <InteractiveRegion position={[0, 5, .05]} label="中部熱區" onClick={() => onRegionSelect?.('center')} />
+            <InteractiveRegion position={[-2, 4.5, 9]} label="南部熱區" onClick={() => onRegionSelect?.('south')} />
 
           </Float>
         </Suspense>
 
-        {/* === 4. 陰影與粒子優化 === */}
-        {/* 加深陰影顏色，更有落地感 */}
         <ContactShadows 
           position={[0, -5, 0]} 
           opacity={0.5} 
@@ -122,25 +113,14 @@ export default function Home3DView({ onRegionSelect, isLocked = false }: Home3DV
           color="#1e293b" 
         />
         
-        {/* 粒子特效 */}
-        <Sparkles 
-          count={40} 
-          scale={20} 
-          size={4} 
-          speed={0.4} 
-          opacity={0.5} 
-          color="#FF8A65" 
-          position={[0, 0, 5]} 
-        />
+        <Sparkles count={40} scale={20} size={4} speed={0.4} opacity={0.5} color="#FF8A65" position={[0, 0, 5]} />
         
-        {/* === 5. 控制器 (限制角度，避免穿幫) === */}
         <OrbitControls 
           enableZoom={true} 
-          enablePan={false} // 禁止平移，避免使用者把模型拖出畫面
+          enablePan={false} 
           enabled={!isLocked}
           minPolarAngle={Math.PI / 4} 
           maxPolarAngle={Math.PI / 2.2}
-          // 限制左右旋轉角度，確保永遠正面迎人
           minAzimuthAngle={-Math.PI / 4}
           maxAzimuthAngle={Math.PI / 4}
         />
