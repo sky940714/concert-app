@@ -39,12 +39,12 @@ function App() {
   };
 
   return (
-    <div className="bg-black h-[100dvh] text-white font-sans selection:bg-cyan-500 selection:text-black overflow-hidden">
+    <div className="bg-[#E0F7FA] h-[100dvh] text-white font-sans selection:bg-cyan-500 selection:text-black overflow-hidden [transform:translateZ(0)]">
       {toastMessage && <Toast message={toastMessage} onClose={() => setToastMessage(null)} />}
       {selectedTicket && <DynamicTicketView ticket={selectedTicket} onClose={() => setSelectedTicket(null)} />}
       {selectedPastTicket && <MiniConcertView ticket={selectedPastTicket} onClose={() => setSelectedPastTicket(null)} />}
       
-      <div className="max-w-md mx-auto h-full bg-black relative shadow-2xl overflow-hidden font-sans border-x border-white/5">
+      <div className="max-w-md mx-auto h-full bg-[#E0F7FA] relative shadow-2xl overflow-hidden font-sans border-x border-white/5">
         {renderContent()}
         
         {!activeVenueId && !selectedTicket && !selectedPastTicket && (

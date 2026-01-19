@@ -57,11 +57,11 @@ export default function Home3DView({ onRegionSelect, isLocked = false, isShrunke
       <Canvas 
   camera={{ position: [0, 25, 30], fov: 50 }} 
   shadows
-  // 新增 gl 屬性來優化 iOS 渲染
+  dpr={[1, 2]}
   gl={{ 
     antialias: true, 
-    powerPreference: "high-performance",
-    preserveDrawingBuffer: true 
+    alpha: true,
+    powerPreference: "high-performance"
   }}
   style={{ width: '100%', height: '100%' }}
   resize={{ scroll: false, debounce: 0 }}
@@ -110,13 +110,13 @@ export default function Home3DView({ onRegionSelect, isLocked = false, isShrunke
         </Suspense>
 
         <ContactShadows 
-            position={[0, -5.5, 0]} // 從 -5 改為 -5.5，增加與島嶼底部的距離
-            opacity={0.4}           // 稍微調低透明度，減少閃爍的視覺衝擊
-            blur={2.5}              // 稍微增加模糊度
-            scale={40} 
-            far={10} 
-            color="#1e293b" 
-            />
+  position={[0, -6, 0]}
+  opacity={0.3}
+  blur={3}
+  scale={40} 
+  far={15} 
+  color="#1e293b" 
+/>
         
         <Sparkles count={40} scale={20} size={4} speed={0.4} opacity={0.5} color="#FF8A65" position={[0, 0, 5]} />
         

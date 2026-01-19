@@ -10,9 +10,11 @@ html, body {
   padding: 0;
   width: 100%;
   height: 100%;
-  overflow: hidden; /* 禁止網頁出現捲軸 */
-  overscroll-behavior: none; /* 🚫 核心關鍵：禁止橡皮筋回彈 */
+  overflow: hidden;
+  overscroll-behavior: none;
   -webkit-overflow-scrolling: touch;
+  position: fixed; /* 防止 iOS 橡皮筋效應 */
+  -webkit-font-smoothing: antialiased;
 }
 
 #root {
