@@ -3,8 +3,6 @@ import { Canvas } from '@react-three/fiber'
 import { 
   OrbitControls, 
   Float, 
-  // ❌ 移除 Environment
-  // Environment, 
   Sparkles,
   ContactShadows,
   SpotLight,
@@ -56,33 +54,29 @@ export default function Home3DView({ onRegionSelect, isLocked = false, isShrunke
     <div 
       className="w-full h-[650px] relative rounded-[2rem] overflow-hidden touch-none"
       style={{
-        backgroundColor: '#F0F9FF',
+        backgroundColor: 'transparent', // 修改：這裡改為透明，由背景組件提供顏色
         transform: 'translate3d(0, 0, 0)',
         WebkitTransform: 'translate3d(0, 0, 0)',
         isolation: 'isolate',
       }}
     >
-      
       <Canvas 
         camera={{ position: [0, 25, 30], fov: 50 }} 
         shadows
         dpr={[1, 2]}
-        // ✅ 測試版本 B: 加入 frameloop 控制
         frameloop="always"
         gl={{ 
-            antialias: true, 
-            alpha: true, // 必須為 true 才能與底層背景融合
-            powerPreference: "high-performance",
-            stencil: false,
-            depth: true,
-            premultipliedAlpha: false, // 防止 iOS 渲染邊緣黑邊
-            }}
+          antialias: true, 
+          alpha: true,               // 重要：必須開啟以配合 CSS 背景
+          powerPreference: "high-performance",
+          stencil: false,
+          depth: true,
+          premultipliedAlpha: false, // 重要：修復 iOS 透明邊緣閃爍
+        }}
         onCreated={({ gl }) => {
-            gl.setClearColor(0x000000, 0); // 設定為完全透明，讓 ConcertAtmosphereBackground 透出
-            gl.autoClear = true;
-            gl.outputColorSpace = 'srgb';
-            gl.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-            }}
+          gl.setClearColor(0x000000, 0); // 重要：設定完全透明
+          gl.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        }}
         style={{ 
           width: '100%', 
           height: '100%',
@@ -91,13 +85,8 @@ export default function Home3DView({ onRegionSelect, isLocked = false, isShrunke
         }}
         resize={{ scroll: false, debounce: 0 }}
       >
-        
         <CanvasSizeController isShrunken={isShrunken} />
         
-        {/* ❌ 移除 Environment,改用簡單光源 */}
-        {/* <Environment preset="city" blur={0.8} /> */}
-        
-        {/* ✅ 改用更簡單的光源組合 */}
         <ambientLight intensity={1.2} />
         <hemisphereLight 
           intensity={0.6} 
@@ -135,11 +124,9 @@ export default function Home3DView({ onRegionSelect, isLocked = false, isShrunke
                 position={[1, 0, -2]} 
                 rotation={[0.18, -6.7, 0]} 
             />
-
             <InteractiveRegion position={[4.5, 7, -10]} label="北部熱區" onClick={() => onRegionSelect?.('north')} />
             <InteractiveRegion position={[0, 5, .05]} label="中部熱區" onClick={() => onRegionSelect?.('center')} />
             <InteractiveRegion position={[-2, 4.5, 9]} label="南部熱區" onClick={() => onRegionSelect?.('south')} />
-
           </Float>
         </Suspense>
 
