@@ -55,10 +55,9 @@ export default function Home3DView({ onRegionSelect, isLocked = false, isShrunke
       className="w-full h-[650px] relative rounded-[2rem] overflow-hidden touch-none"
       style={{
         backgroundColor: '#E0F7FA', // 保持實色背景
-        // ✅ 測試：移除可能衝突的 transform
-        // transform: 'translate3d(0, 0, 0)',
-        // WebkitTransform: 'translate3d(0, 0, 0)',
-        // isolation: 'isolate',
+        transform: 'translate3d(0, 0, 0)',
+        WebkitTransform: 'translate3d(0, 0, 0)',
+        isolation: 'isolate',
       }}
     >
       <Canvas 
