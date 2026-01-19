@@ -4,7 +4,7 @@ import type { Region } from '../types';
 export const MOCK_REGIONS: Region[] = [
   {
     id: 'north',
-    name: '精選推薦 (Hot)',
+    name: '北部熱門',
     x: 0,
     y: -90, // 落在票券上半部
     z: 60,
@@ -15,7 +15,7 @@ export const MOCK_REGIONS: Region[] = [
   },
   {
     id: 'center',
-    name: '熱門票券 (Tickets)',
+    name: '中部熱門',
     x: 0,
     y: 10, // 落在票券中心文字下方
     z: 60,
@@ -26,7 +26,7 @@ export const MOCK_REGIONS: Region[] = [
   },
   {
     id: 'south',
-    name: '附近的活動 (Nearby)',
+    name: '南部熱門',
     x: 0,
     y: 110, // 落在票券下半部
     z: 60,
