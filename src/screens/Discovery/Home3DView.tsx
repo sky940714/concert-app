@@ -3,7 +3,8 @@ import { Canvas } from '@react-three/fiber'
 import { 
   OrbitControls, 
   Float, 
-  Environment, 
+  // ❌ 移除 Environment
+  // Environment, 
   Sparkles,
   ContactShadows,
   SpotLight,
@@ -55,7 +56,6 @@ export default function Home3DView({ onRegionSelect, isLocked = false, isShrunke
     <div 
       className="w-full h-[650px] relative rounded-[2rem] overflow-hidden touch-none"
       style={{
-        // ✅ iOS 修復:給容器加上背景色 (關鍵!)
         backgroundColor: '#F0F9FF',
         transform: 'translate3d(0, 0, 0)',
         WebkitTransform: 'translate3d(0, 0, 0)',
@@ -67,9 +67,10 @@ export default function Home3DView({ onRegionSelect, isLocked = false, isShrunke
         camera={{ position: [0, 25, 30], fov: 50 }} 
         shadows
         dpr={[1, 2]}
+        // ✅ 測試版本 B: 加入 frameloop 控制
+        frameloop="always"
         gl={{ 
           antialias: true, 
-          // ✅ iOS 關鍵修復:關閉透明度 (從 true 改成 false!)
           alpha: false,
           powerPreference: "high-performance",
           depth: true,
@@ -78,10 +79,11 @@ export default function Home3DView({ onRegionSelect, isLocked = false, isShrunke
           failIfMajorPerformanceCaveat: false,
         }}
         onCreated={({ gl }) => {
-          // ✅ iOS 修復:設定不透明背景 (alpha 從 0 改成 1!)
           gl.setClearColor('#F0F9FF', 1);
           gl.autoClear = true;
           gl.outputColorSpace = 'srgb';
+          // ✅ iOS 專用:限制 pixel ratio
+          gl.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         }}
         style={{ 
           width: '100%', 
@@ -94,12 +96,20 @@ export default function Home3DView({ onRegionSelect, isLocked = false, isShrunke
         
         <CanvasSizeController isShrunken={isShrunken} />
         
-        <Environment preset="city" blur={0.8} />
-        <ambientLight intensity={0.8} />       
+        {/* ❌ 移除 Environment,改用簡單光源 */}
+        {/* <Environment preset="city" blur={0.8} /> */}
+        
+        {/* ✅ 改用更簡單的光源組合 */}
+        <ambientLight intensity={1.2} />
+        <hemisphereLight 
+          intensity={0.6} 
+          color="#ffffff"
+          groundColor="#E0F7FA" 
+        />
         
         <directionalLight 
           position={[10, 20, 10]} 
-          intensity={2.5} 
+          intensity={2.0} 
           color="#ffffff" 
           castShadow 
           shadow-bias={-0.0005}
@@ -110,10 +120,10 @@ export default function Home3DView({ onRegionSelect, isLocked = false, isShrunke
           angle={0.5}
           attenuation={5}
           anglePower={5}
-          intensity={10} 
+          intensity={8} 
           color="#BAE6FD" 
         />
-        <pointLight position={[-10, 0, 10]} intensity={1} color="#FFD180" />
+        <pointLight position={[-10, 0, 10]} intensity={0.8} color="#FFD180" />
         
         <Suspense fallback={null}>
           <Float 
