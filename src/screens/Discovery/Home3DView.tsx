@@ -57,11 +57,17 @@ export default function Home3DView({ onRegionSelect, isLocked = false, isShrunke
       <Canvas 
   camera={{ position: [0, 25, 30], fov: 50 }} 
   shadows
-  dpr={[1, 2]}
+  dpr={[1, 2]} // 限制像素比減少 GPU 負擔
   gl={{ 
     antialias: true, 
     alpha: true,
-    powerPreference: "high-performance"
+    powerPreference: "high-performance",
+    depth: true,
+    stencil: false
+  }}
+  onCreated={({ gl }) => {
+    // 強制 WebGL 背景清理為白色/淡藍色而非黑色
+    gl.setClearColor('#F0F9FF', 1);
   }}
   style={{ width: '100%', height: '100%' }}
   resize={{ scroll: false, debounce: 0 }}

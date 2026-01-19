@@ -13,8 +13,10 @@ html, body {
   overflow: hidden;
   overscroll-behavior: none;
   -webkit-overflow-scrolling: touch;
-  position: fixed; /* 防止 iOS 橡皮筋效應 */
-  -webkit-font-smoothing: antialiased;
+  /* 新增：強制鎖定視口，防止渲染黑影 */
+  position: fixed; 
+  background-color: #F0F9FF; 
+  -webkit-user-select: none;
 }
 
 #root {

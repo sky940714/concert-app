@@ -39,12 +39,17 @@ function App() {
   };
 
   return (
-    <div className="bg-[#E0F7FA] h-[100dvh] text-white font-sans selection:bg-cyan-500 selection:text-black overflow-hidden [transform:translateZ(0)]">
+    /* 修正點 1: 將最外層 bg 改為與背景漸層最接近的淺藍色，徹底消除黑影跳動
+       修正點 2: 使用 isolation-auto 確保圖層合成不會因為 3D 模型渲染而產生視覺衝突
+    */
+    <div className="bg-[#F0F9FF] h-[100dvh] text-slate-600 font-sans selection:bg-cyan-500 selection:text-black overflow-hidden touch-none">
       {toastMessage && <Toast message={toastMessage} onClose={() => setToastMessage(null)} />}
       {selectedTicket && <DynamicTicketView ticket={selectedTicket} onClose={() => setSelectedTicket(null)} />}
       {selectedPastTicket && <MiniConcertView ticket={selectedPastTicket} onClose={() => setSelectedPastTicket(null)} />}
       
-      <div className="max-w-md mx-auto h-full bg-[#E0F7FA] relative shadow-2xl overflow-hidden font-sans border-x border-white/5">
+      {/* 修正點 3: 內層容器 bg 改為 bg-transparent，避免與 ConcertAtmosphereBackground 的層級發生閃爍
+      */}
+      <div className="max-w-md mx-auto h-full bg-transparent relative shadow-2xl overflow-hidden font-sans border-x border-white/5">
         {renderContent()}
         
         {!activeVenueId && !selectedTicket && !selectedPastTicket && (
