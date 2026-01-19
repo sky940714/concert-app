@@ -62,7 +62,7 @@ export default function Home3DView({ onRegionSelect, isLocked = false, isShrunke
     >
       <Canvas 
         camera={{ position: [0, 25, 30], fov: 50 }} 
-        // shadows  // ✅ 測試 A：關閉 shadows
+        shadows
         dpr={[1, 2]}
         frameloop="always"
         gl={{ 
