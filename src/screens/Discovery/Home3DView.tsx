@@ -74,11 +74,10 @@ export default function Home3DView({ onRegionSelect, isLocked = false, isShrunke
           depth: true,
           premultipliedAlpha: false,
         }}
-        // ✅ 測試 A：移除 onCreated
-        // onCreated={({ gl }) => {
-        //   gl.setClearColor(0x000000, 0);
-        //   gl.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        // }}
+        onCreated={({ gl }) => {
+            gl.setClearColor(0x000000, 0);
+            gl.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        }}
         style={{ 
           width: '100%', 
           height: '100%',
