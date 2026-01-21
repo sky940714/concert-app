@@ -50,10 +50,10 @@ function App() {
       {/* 修正點 3: 內層容器 bg 改為 bg-transparent，避免與 ConcertAtmosphereBackground 的層級發生閃爍
       */}
       <div 
-        className="max-w-md mx-auto h-full bg-transparent relative shadow-2xl overflow-hidden font-sans border-x border-white/5"
-        style={{ isolation: 'isolate' }} // 強制隔離渲染層，解決 iOS 閃爍關鍵
-      >
-        {renderContent()}
+      className="max-w-md mx-auto h-full bg-transparent relative shadow-2xl overflow-hidden font-sans border-x border-white/5"
+      style={{ isolation: 'isolate' }} // 強制隔離渲染層，解決 iOS 閃爍關鍵
+    >
+      {renderContent()}
         
         {!activeVenueId && !selectedTicket && !selectedPastTicket && (
           <BottomTabBar activeTab={activeTab} onTabChange={setActiveTab} />
