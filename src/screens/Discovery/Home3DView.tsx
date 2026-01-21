@@ -7,7 +7,8 @@ import {
   SpotLight,
   Html 
 } from '@react-three/drei'
-import { Model as TaiwanModel } from '../../components/models/Taiwan-island'
+// 1. 更改匯入：指向您新生成的元件檔案
+import { TaiwanNew } from '../../components/models/Taiwan_island0121'
 import { CanvasSizeController } from '../../components/effects'
 
 interface Home3DViewProps {
@@ -85,60 +86,28 @@ export default function Home3DView({ onRegionSelect, isLocked = false, isShrunke
         <CanvasSizeController isShrunken={isShrunken} />
         
         <ambientLight intensity={1.2} />
-        
-        <hemisphereLight 
-          intensity={0.6} 
-          color="#ffffff"
-          groundColor="#E0F7FA" 
-        />
-        
-        <directionalLight 
-          position={[10, 20, 10]} 
-          intensity={2.0} 
-          color="#ffffff" 
-          castShadow 
-          shadow-bias={-0.0005}
-        />
-
-        <SpotLight
-          position={[-20, 10, -10]}
-          angle={0.5}
-          attenuation={5}
-          anglePower={5}
-          intensity={8} 
-          color="#BAE6FD" 
-        />
-        
+        <hemisphereLight intensity={0.6} color="#ffffff" groundColor="#E0F7FA" />
+        <directionalLight position={[10, 20, 10]} intensity={2.0} color="#ffffff" castShadow shadow-bias={-0.0005} />
+        <SpotLight position={[-20, 10, -10]} angle={0.5} attenuation={5} anglePower={5} intensity={8} color="#BAE6FD" />
         <pointLight position={[-10, 0, 10]} intensity={0.8} color="#FFD180" />
         
         <Suspense fallback={null}>
-          <Float 
-            speed={2} 
-            rotationIntensity={0.1} 
-            floatIntensity={0.5} 
-            floatingRange={[-0.5, 0.5]}
-          >
-            <TaiwanModel 
+          <Float speed={2} rotationIntensity={0.1} floatIntensity={0.5} floatingRange={[-0.5, 0.5]}>
+            {/* 2. 替換元件：使用新模型 TaiwanNew */}
+            <TaiwanNew 
               scale={18} 
               position={[1, 0, -2]} 
               rotation={[0.18, -6.7, 0]} 
             />
             
-            {/* ✅ 測試 10（最終測試）：加回 InteractiveRegion */}
+            {/* 3. 注意：如果新模型的尺寸不同，您可能需要微調下面這些 InteractiveRegion 的座標 */}
             <InteractiveRegion position={[4.5, 7, -10]} label="北部熱區" onClick={() => onRegionSelect?.('north')} />
             <InteractiveRegion position={[0, 5, .05]} label="中部熱區" onClick={() => onRegionSelect?.('center')} />
             <InteractiveRegion position={[-2, 4.5, 9]} label="南部熱區" onClick={() => onRegionSelect?.('south')} />
           </Float>
         </Suspense>
 
-        <ContactShadows 
-          position={[0, -6.5, 0]}
-          opacity={0.3}
-          blur={3.5}
-          scale={45} 
-          far={20} 
-          color="#1e293b" 
-        />
+        <ContactShadows position={[0, -6.5, 0]} opacity={0.3} blur={3.5} scale={45} far={20} color="#1e293b" />
         
         <OrbitControls 
           enableZoom={true} 
