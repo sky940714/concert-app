@@ -24,7 +24,7 @@ function App() {
     
     switch (activeTab) {
       case 'discovery':
-        return <StarshipHub onVenueSelect={setActiveVenueId} />;
+        return <StarshipHub onVenueSelect={setActiveVenueId} showToast={showToast} />; // ✅ 新增 showToast
       case 'tickets':
         return <TicketWallet onSelectTicket={setSelectedTicket} onSelectPastTicket={setSelectedPastTicket} />;
       case 'nearby':
