@@ -170,7 +170,7 @@ export const TicketWallet = ({ onSelectTicket, onSelectPastTicket }: TicketWalle
                     onClick={() => handleEntryRequest(ticket)}
                     className="clay-btn-orange px-5 py-3 flex items-center gap-2 shadow-orange-100"
                   >
-                    <span className="text-sm font-black">驗證入場</span>
+                    <span className="text-sm font-black">出示通行碼</span> {/* ✅ 統一更名 */}
                     <ChevronRight size={16} strokeWidth={4} />
                   </button>
                 </div>

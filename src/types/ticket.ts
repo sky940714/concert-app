@@ -9,4 +9,5 @@ export interface Ticket {
   gate?: string;
   color: string;
   img: string;
+  isLinked: boolean; // ✅ 新增：標記是否已通過實名驗證歸戶
 }
