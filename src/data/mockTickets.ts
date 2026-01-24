@@ -3,10 +3,10 @@ import type { Ticket } from '../types';
 export const MOCK_TICKETS: Ticket[] = [
   {
     id: "T-2024001",
-    event: "五月天 [回到那一天]",
+    event: "周杰倫 [嘉年華]",
     date: "2025-05-25",
     time: "19:30",
-    venue: "臺北大巨蛋",
+    venue: "臺北小巨蛋",
     seat: "搖滾A區 5排 12號",
     status: "active",
     gate: "Gate A",

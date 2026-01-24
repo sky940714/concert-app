@@ -7,7 +7,8 @@ import {
   CheckCircle2, 
   Loader2, 
   ShieldCheck, 
-  Camera 
+  Camera,
+  HelpCircle
 } from 'lucide-react';
 
 type Step = 
@@ -22,9 +23,10 @@ type Step =
 interface KYCScreenProps {
   onComplete: (success: boolean) => void;
   onBack: () => void;
+  onGoToSupport?: () => void; // 新增：跳轉至支援中心的處理函式
 }
 
-export function KYCScreen({ onComplete, onBack }: KYCScreenProps) {
+export function KYCScreen({ onComplete, onBack, onGoToSupport }: KYCScreenProps) {
   const [step, setStep] = useState<Step>('intro');
   const [isScanning, setIsScanning] = useState(false);
   const [scanProgress, setScanProgress] = useState(0);
@@ -35,8 +37,6 @@ export function KYCScreen({ onComplete, onBack }: KYCScreenProps) {
 
   // 定義演示用的變數
   const isLiveness = step === 'liveness-intro' || step === 'liveness-action';
-  // 增加底部邊距，確保高於導覽列 (BottomTabBar 在 bottom-6 左右)
-  const safeBottomClass = "pb-32"; 
 
   const startCamera = async () => {
     try {
@@ -77,7 +77,7 @@ export function KYCScreen({ onComplete, onBack }: KYCScreenProps) {
           setCaptured(true);
           return 100;
         }
-        return prev + 2; // 稍微調慢讓演示更有感
+        return prev + 2; 
       });
     }, 40);
   };
@@ -90,33 +90,44 @@ export function KYCScreen({ onComplete, onBack }: KYCScreenProps) {
   // 1. 服務條款頁面 (Intro)
   if (step === 'intro') {
     return (
-      <div className="h-full bg-[#F0F9FF] flex flex-col p-8 pt-16 font-sans relative">
+      <div className="fixed inset-0 z-[100] bg-[#F0F9FF] flex flex-col p-8 pt-16 font-sans">
         <button onClick={onBack} className="absolute top-6 left-6 p-2 bg-white rounded-full shadow-sm">
           <ArrowLeft size={20} className="text-slate-600"/>
         </button>
-        <div className="flex-1 flex flex-col items-center justify-center text-center pb-20">
+        
+        <div className="flex-1 flex flex-col items-center justify-center text-center">
           <div className="w-20 h-20 bg-white rounded-[1.5rem] shadow-lg flex items-center justify-center mb-8 animate-pulse shrink-0">
              <ShieldCheck size={40} className="text-indigo-500" />
           </div>
+          
           <h2 className="text-2xl font-black text-slate-700 mb-6 tracking-tighter">實名認證</h2>
-          <div className="bg-white/60 backdrop-blur-sm p-6 rounded-[2rem] border border-white/50 text-left space-y-4 shadow-sm w-full max-w-xs">
+          
+          <div className="bg-white/60 backdrop-blur-sm p-6 rounded-[2rem] border border-white/50 text-left space-y-5 shadow-sm w-full max-w-xs mb-8">
              <div className="flex gap-4 items-center">
-                <FileCheck size={20} className="text-indigo-600 shrink-0"/>
-                <p className="text-sm text-slate-500 font-bold">準備身分證正反面照片</p>
+                <div className="bg-indigo-50 p-2 rounded-xl text-indigo-600"><FileCheck size={20}/></div>
+                <p className="text-sm text-slate-500 font-bold">準備身分證正本掃描</p>
              </div>
              <div className="flex gap-4 items-center">
-                <Smile size={20} className="text-indigo-600 shrink-0"/>
-                <p className="text-sm text-slate-500 font-bold">需進行本人臉部活體辨識</p>
+                <div className="bg-purple-50 p-2 rounded-xl text-purple-600"><Smile size={20}/></div>
+                <p className="text-sm text-slate-500 font-bold">需進行本人活體辨識</p>
              </div>
           </div>
 
-          {/* 下一步按鈕：放在內容中間，且位置絕對高於導覽列 */}
-          <div className="mt-10 w-full max-w-xs">
+          <div className="w-full max-w-xs space-y-4">
             <button 
               onClick={() => setStep('scan-front')}
               className="w-full bg-[#FF8A65] text-white font-black py-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 active:scale-95 transition-all"
             >
               下一步：開始掃描 <ArrowLeft className="rotate-180" size={18} strokeWidth={4}/>
+            </button>
+
+            {/* 新增：導引至支援中心的常見問題連結 */}
+            <button 
+              onClick={onGoToSupport}
+              className="w-full flex items-center justify-center gap-2 py-3 text-slate-400 hover:text-indigo-500 transition-colors"
+            >
+              <HelpCircle size={16} />
+              <span className="text-xs font-black border-b border-slate-200">遇到問題？查看常見問題集</span>
             </button>
           </div>
         </div>
@@ -127,7 +138,7 @@ export function KYCScreen({ onComplete, onBack }: KYCScreenProps) {
   // 5. 提交與結果頁面
   if (step === 'submitting' || step === 'pending') {
     return (
-      <div className="h-full bg-[#F0F9FF] flex flex-col items-center justify-center p-8 text-center">
+      <div className="fixed inset-0 z-[100] bg-[#F0F9FF] flex flex-col items-center justify-center p-8 text-center">
         {step === 'submitting' ? (
           <>
             <Loader2 className="w-16 h-16 text-indigo-500 animate-spin mb-4" />
@@ -149,8 +160,7 @@ export function KYCScreen({ onComplete, onBack }: KYCScreenProps) {
 
   // 2-4 相機與辨識流程
   return (
-    <div className="h-full bg-slate-900 relative flex flex-col overflow-hidden font-sans">
-      {/* 假裝有相機畫面：即使啟動失敗也會有漸層背景 */}
+    <div className="fixed inset-0 z-[100] bg-slate-900 flex flex-col overflow-hidden font-sans">
       <div className="absolute inset-0 bg-gradient-to-b from-slate-800 to-black">
         <video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-cover opacity-60" />
       </div>
@@ -166,7 +176,6 @@ export function KYCScreen({ onComplete, onBack }: KYCScreenProps) {
             </h3>
          </div>
          
-         {/* 掃描框 */}
          <div className={`relative border-2 border-white/40 shadow-[0_0_0_9999px_rgba(0,0,0,0.7)] transition-all duration-700 ${isLiveness ? 'w-64 h-64 rounded-full' : 'w-80 h-52 rounded-[2rem]'}`}>
             {(isScanning || step === 'liveness-action') && (
                 <div className="absolute top-0 left-0 w-full h-1 bg-cyan-400 shadow-[0_0_20px_rgba(34,211,238,1)] animate-scanner" />
@@ -190,7 +199,6 @@ export function KYCScreen({ onComplete, onBack }: KYCScreenProps) {
          </div>
       </div>
 
-      {/* 底部按鈕控制區：使用 pb-40 確保完全避開導覽列 */}
       <div className="absolute bottom-0 w-full px-10 z-20 flex justify-center pb-32 bg-gradient-to-t from-black to-transparent">
          {captured && !isScanning ? (
            <button 
