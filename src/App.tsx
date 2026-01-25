@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Toast } from './components/common';
 import { BottomTabBar, type TabId } from './components/navigation';
-import { StarshipHub, VenueDetailView } from './screens/Discovery';
+import { DiscoveryHub, VenueDetailView } from './screens/Discovery'; 
+import { EventDetailView } from './screens/Discovery/EventDetailView'; 
 import { TicketWallet, DynamicTicketView, MiniConcertView } from './screens/Tickets';
 import { ProfileHub } from './screens/Profile';
 import { SupportHub } from './screens/Support';
@@ -14,49 +15,58 @@ function App() {
   const [selectedPastTicket, setSelectedPastTicket] = useState<Ticket | null>(null);
   const [activeVenueId, setActiveVenueId] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [isImporting, setIsImporting] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
 
   const showToast = (msg: string) => setToastMessage(msg);
 
   const renderContent = () => {
+    // ✅ 優先權 1：點擊演唱會詳情
+    if (selectedEvent) {
+      return <EventDetailView event={selectedEvent} onBack={() => setSelectedEvent(null)} showToast={showToast} />;
+    }
+
+    // ✅ 優先權 2：點擊「珍藏回憶」詳情 (原本漏掉這段)
+    if (selectedPastTicket) {
+      return <MiniConcertView ticket={selectedPastTicket} onClose={() => setSelectedPastTicket(null)} />;
+    }
+
+    // ✅ 優先權 3：場館詳情
     if (activeTab === 'discovery' && activeVenueId) {
       return <VenueDetailView venueId={activeVenueId} onBack={() => setActiveVenueId(null)} />;
     }
-    
+
+    // 一般分頁
     switch (activeTab) {
-      case 'discovery':
-        return <StarshipHub onVenueSelect={setActiveVenueId} showToast={showToast} />; // ✅ 新增 showToast
-      case 'tickets':
-        return <TicketWallet onSelectTicket={setSelectedTicket} onSelectPastTicket={setSelectedPastTicket} />;
-      case 'nearby':
-        return <NearbyHub showToast={showToast} />;
-      case 'profile':
-        return <ProfileHub showToast={showToast} />;
-      case 'support':
-        return <SupportHub />;
-      default:
-        return null;
+      case 'discovery': return <DiscoveryHub onVenueSelect={setActiveVenueId} onSelectEvent={setSelectedEvent} />; 
+      case 'tickets': return <TicketWallet onSelectTicket={setSelectedTicket} onSelectPastTicket={setSelectedPastTicket} />;
+      case 'nearby': return <NearbyHub showToast={showToast} />;
+      case 'profile': return <ProfileHub showToast={showToast} onImportingChange={setIsImporting} />;
+      case 'support': return <SupportHub />;
+      default: return null;
     }
   };
 
+  // 控制導覽列隱藏
+  const shouldHideTabBar = activeVenueId || selectedTicket || selectedPastTicket || isImporting || selectedEvent;
+
   return (
-    /* 修正點 1: 將最外層 bg 改為與背景漸層最接近的淺藍色，徹底消除黑影跳動
-       修正點 2: 使用 isolation-auto 確保圖層合成不會因為 3D 模型渲染而產生視覺衝突
-    */
-    <div className="bg-[#F0F9FF] h-[100dvh] text-slate-600 font-sans selection:bg-cyan-500 selection:text-black overflow-hidden touch-none">
+    <div className="bg-[#F0F9FF] min-h-screen text-slate-600 font-sans">
       {toastMessage && <Toast message={toastMessage} onClose={() => setToastMessage(null)} />}
-      {selectedTicket && <DynamicTicketView ticket={selectedTicket} onClose={() => setSelectedTicket(null)} />}
-      {selectedPastTicket && <MiniConcertView ticket={selectedPastTicket} onClose={() => setSelectedPastTicket(null)} />}
       
-      {/* 修正點 3: 內層容器 bg 改為 bg-transparent，避免與 ConcertAtmosphereBackground 的層級發生閃爍
-      */}
+      {/* 僅用於 Modal 彈窗形式的組件 */}
+      {selectedTicket && <DynamicTicketView ticket={selectedTicket} onClose={() => setSelectedTicket(null)} />}
+      
       <div 
-      className="max-w-md mx-auto h-full bg-transparent relative shadow-2xl overflow-hidden font-sans border-x border-white/5"
-      style={{ isolation: 'isolate' }} // 強制隔離渲染層，解決 iOS 閃爍關鍵
-    >
-      {renderContent()}
+        className="max-w-md mx-auto min-h-screen bg-transparent relative shadow-2xl border-x border-white/5"
+        style={{ isolation: 'isolate' }} 
+      >
+        {renderContent()}
         
-        {!activeVenueId && !selectedTicket && !selectedPastTicket && (
-          <BottomTabBar activeTab={activeTab} onTabChange={setActiveTab} />
+        {!shouldHideTabBar && (
+          <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto z-50">
+            <BottomTabBar activeTab={activeTab} onTabChange={setActiveTab} />
+          </div>
         )}
       </div>
     </div>

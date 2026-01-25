@@ -1,7 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { X, Camera, Smartphone, UserCheck, ShieldCheck, Loader2, CheckCircle, Info } from 'lucide-react';
 
-export const ImportTicketScreen = ({ onClose, onImport }: { onClose: () => void, onImport: (ticket: any) => void }) => {
+interface ImportTicketScreenProps {
+  onClose: () => void;
+  onImport: (ticket: any) => void;
+  // ✅ 新增：接收來自父層的狀態切換函式
+  onImportingChange?: (isImporting: boolean) => void; 
+}
+
+export const ImportTicketScreen = ({ onClose, onImport, onImportingChange }: ImportTicketScreenProps) => {
   const [step, setStep] = useState<'ocr' | 'twid' | 'liveness' | 'success'>('ocr');
   const [isProcessing, setIsProcessing] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -10,6 +17,17 @@ export const ImportTicketScreen = ({ onClose, onImport }: { onClose: () => void,
 
   // 模擬設備 UUID
   const deviceUUID = "DVC-8824-X99-LIT";
+
+  // ✅ 核心修正 1：自動管理導覽列的顯示/隱藏
+  useEffect(() => {
+    // 當組件掛載（顯示）時，通知 App.tsx 隱藏導覽列
+    onImportingChange?.(true); 
+    
+    // 當組件卸載（關閉）時，恢復導覽列顯示
+    return () => {
+      onImportingChange?.(false); 
+    };
+  }, [onImportingChange]);
 
   // 管理相機開啟與關閉
   useEffect(() => {
@@ -41,7 +59,7 @@ export const ImportTicketScreen = ({ onClose, onImport }: { onClose: () => void,
 
   const startNextProcess = (current: typeof step) => {
     setIsProcessing(true);
-    stopCamera(); // 處理中暫時關閉相機以節省資源
+    stopCamera(); 
     
     setTimeout(() => {
       setIsProcessing(false);
@@ -67,7 +85,12 @@ export const ImportTicketScreen = ({ onClose, onImport }: { onClose: () => void,
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-900/95 backdrop-blur-2xl flex flex-col font-sans text-white overflow-hidden">
+    /**
+     * ✅ 核心修正 2：層級優化。
+     * 使用 z-[100] 確保它絕對在 BottomTabBar (z-50) 之上。
+     * 背景使用實體色 bg-slate-900 以免透出底層內容。
+     */
+    <div className="fixed inset-0 z-[100] bg-slate-900 flex flex-col font-sans text-white overflow-hidden shadow-2xl">
       {/* 頂部標題 */}
       <div className="p-6 flex justify-between items-center shrink-0">
         <div>
@@ -83,7 +106,9 @@ export const ImportTicketScreen = ({ onClose, onImport }: { onClose: () => void,
             ))}
           </div>
         </div>
-        <button onClick={onClose} className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center active:scale-90 transition-transform"><X size={20}/></button>
+        <button onClick={onClose} className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center active:scale-90 transition-transform">
+          <X size={20}/>
+        </button>
       </div>
 
       <div className="flex-1 flex flex-col items-center justify-center p-8 text-center relative">
@@ -100,7 +125,6 @@ export const ImportTicketScreen = ({ onClose, onImport }: { onClose: () => void,
           </div>
         ) : (
           <div className="w-full max-w-sm space-y-8 animate-in fade-in zoom-in duration-500">
-            
             {/* 步驟 1: OCR 實境相機 */}
             {step === 'ocr' && (
               <>
@@ -141,7 +165,6 @@ export const ImportTicketScreen = ({ onClose, onImport }: { onClose: () => void,
                     {phoneNumber.length === 10 && <CheckCircle className="absolute right-4 top-1/2 -translate-y-1/2 text-emerald-500" size={24} />}
                   </div>
                   
-                  {/* 設備綁定字樣 */}
                   <div className="bg-emerald-500/10 border border-emerald-500/20 p-4 rounded-2xl flex items-start gap-3 text-left">
                     <CheckCircle className="text-emerald-500 shrink-0 mt-0.5" size={16} />
                     <div>
