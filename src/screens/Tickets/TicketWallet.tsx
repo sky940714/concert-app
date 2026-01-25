@@ -194,8 +194,13 @@ export const TicketWallet = ({ onSelectTicket, onSelectPastTicket }: TicketWalle
               className="clay-inset p-4 flex justify-between items-center cursor-pointer transition-all active:scale-[0.98] hover:bg-white/40"
             >
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center text-xl">
-                  {ticket.img}
+                <div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center text-xl overflow-hidden">
+                  {/* 💡 這裡加入判斷邏輯：如果是圖片路徑則顯示 img，如果是 Emoji 則顯示文字 */}
+                  {typeof ticket.img === 'string' && (ticket.img.includes('/') || ticket.img.includes('data:')) ? (
+                    <img src={ticket.img} className="w-full h-full object-cover" alt="" />
+                  ) : (
+                    ticket.img
+                  )}
                 </div>
                 <div>
                   <div className="font-bold text-slate-600 text-sm mb-0.5">{ticket.event}</div>
