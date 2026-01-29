@@ -5,6 +5,12 @@ import { StarshipHub } from './StarshipHub';
 import { EventCard } from '../../components/common/EventCard'; 
 import { Bell, LayoutGrid, Music, Film, Ticket, Sparkles } from 'lucide-react';
 import { VenueSelector } from './VenueSelector';
+import emergeFestImg from '../../assets/emerge_fest.jpg';
+import ultraTaiwanImg from '../../assets/ULTRA_Taiwan.jpg';
+import taipeiArtImg from '../../assets/taipei_art.jpg';
+import jayCarnivalImg from '../../assets/jay-carnival.jpg';
+import flyCarImg from '../../assets/fly_car.jpg';
+import shadowImg from '../../assets/shadow.jpg';
 
 // 1. ✅ 頂部大型滑軌資料
 const HERO_POSTERS = [
@@ -13,8 +19,7 @@ const HERO_POSTERS = [
     title: "2026 浮現祭：春日搖滾", 
     date: "2026.04.25 - 04.26", 
     venue: "臺北流行音樂中心", 
-    // 修改處：指向本地 assets
-    img: "/src/assets/emerge_fest.jpg", 
+    img: emergeFestImg, // ✅ 改用導入的變數
     category: "音樂",
     description: "2026 春季最強音樂盛事！",
     kktixUrl: "https://kktix.com",
@@ -25,8 +30,7 @@ const HERO_POSTERS = [
     title: "ULTRA Taiwan 2026", 
     date: "2026.11.16", 
     venue: "大佳河濱公園", 
-    // 修改處：指向本地 assets
-    img: "/src/assets/ULTRA_Taiwan.jpg", 
+    img: ultraTaiwanImg, // ✅ 改用導入的變數
     category: "活動",
     description: "全球頂尖 DJ 陣容降臨台北！",
     kktixUrl: "https://kktix.com",
@@ -37,8 +41,7 @@ const HERO_POSTERS = [
     title: "2026 台北藝術博覽會", 
     date: "2026.08.12", 
     venue: "世貿一館", 
-    // 修改處：指向本地 assets
-    img: "/src/assets/taipei_art.jpg", 
+    img: taipeiArtImg, // ✅ 改用導入的變數
     category: "活動",
     description: "年度規模最大的當代藝術盛會。",
     kktixUrl: "https://kktix.com",
@@ -46,31 +49,28 @@ const HERO_POSTERS = [
   }
 ];
 
-// 2. ✅ 下方發燒列表 - 修改圖片路徑
+// 2. ✅ 下方發燒列表
 const WEEKLY_TRENDING = [
   {
     title: "2026 周杰倫 [ 嘉年華 ]",
     date: "2026.05.12",
     venue: "臺北大巨蛋",
     category: "音樂",
-    // 修改處：指向本地 assets
-    img: "/src/assets/jay-carnival.jpg", 
+    img: jayCarnivalImg, // ✅ 改用導入的變數
   },
   {
     title: "落日飛車 台北專場",
     date: "2026.06.01",
     venue: "Zepp New Taipei",
     category: "音樂",
-    // 修改處：指向本地 assets
-    img: "/src/assets/fly_car.jpg", 
+    img: flyCarImg, // ✅ 改用導入的變數
   },
   {
     title: "數位沉浸式特展：光影畫境",
     date: "2026.07.15",
     venue: "松山文創園區",
     category: "活動",
-    // 修改處：指向本地 assets
-    img: "/src/assets/shadow.jpg", 
+    img: shadowImg, // ✅ 改用導入的變數
   }
 ];
 
