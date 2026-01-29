@@ -44,7 +44,6 @@ export const EventCard = ({
             {title}
           </h3>
           <div className="text-[#FF8A65] font-black text-base whitespace-nowrap">
-            ${priceRange}
           </div>
         </div>
 
