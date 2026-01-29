@@ -1,53 +1,94 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, MapPin, ChevronRight, Users, Activity, Navigation, Music } from 'lucide-react';
+import { ArrowLeft, MapPin, ChevronRight, Users, Navigation, Music } from 'lucide-react';
 
 interface VenueDetailViewProps {
-  venueId: string;
+  venueId: string; // 接收具體場館名稱，例如 "高雄流行音樂中心"
   onBack: () => void;
 }
 
-// ✅ 修正：對應 3D 標籤傳出的 'north', 'center', 'south'
+// ✅ 完整對接資料庫：確保與 VenueSelector 中的名稱完全一致，並移除金額顯示
 const MOCK_VENUES_DATA: any = {
-  "north": { 
-    name: "臺北大巨蛋", 
+  "台北小巨蛋": { 
+    name: "台北小巨蛋", 
     city: "Taipei", 
     img: "https://images.unsplash.com/photo-1574914629385-a1c905587790?w=800", 
+    capacity: "15,000", 
+    status: "Hot", 
+    events: [{ id: 'e1', title: '2026 演唱會盛典', date: '2026-05-12', category: '音樂' }]
+  },
+  "台北大巨蛋": { 
+    name: "台北大巨蛋", 
+    city: "Taipei", 
+    img: "https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=800", 
     capacity: "40,000+", 
     status: "Hot", 
-    theme: "#FF8A65",
     events: [
-      { id: 'e1', title: '2026 周杰倫 [ 嘉年華 ]', date: '2026-05-12', price: '$1,880 - $6,880', category: '音樂' },
-      { id: 'e2', title: '2026 台北藝術博覽會', date: '2026-08-12', price: '展覽門票', category: '活動' }
+      { id: 'e2', title: '2026 周杰倫 [ 嘉年華 ]', date: '2026-05-12', category: '音樂' },
+      { id: 'e3', title: '2026 台北藝術博覽會', date: '2026-08-12', category: '活動' }
     ]
   },
-  "center": { 
-    name: "臺中圓滿戶外劇場", 
+  "台北流行音樂中心": {
+    name: "台北流行音樂中心",
+    city: "Taipei",
+    img: "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=800",
+    capacity: "5,000",
+    status: "Active",
+    events: [{ id: 'e4', title: '2026 浮現祭：春日搖滾', date: '2026-04-25', category: '音樂' }]
+  },
+  "洲際棒球場": { 
+    name: "洲際棒球場", 
     city: "Taichung", 
     img: "https://images.unsplash.com/photo-1506157786151-b8491531f063?w=800", 
-    capacity: "15,000", 
+    capacity: "20,000", 
     status: "Active", 
-    theme: "#99E6D9",
-    events: [
-      { id: 'e3', title: '浮現祭：春日搖滾', date: '2026-04-25', price: '$2,200', category: '音樂祭' }
-    ]
+    events: [{ id: 'e5', title: '中職明星賽 2026', date: '2026-07-15', category: '體育' }]
   },
-  "south": { 
+  "台中歌劇院": {
+    name: "台中歌劇院",
+    city: "Taichung",
+    img: "https://images.unsplash.com/photo-1506157786151-b8491531f063?w=800",
+    capacity: "2,014",
+    status: "Active",
+    events: [{ id: 'e6', title: '年度歌劇：卡門', date: '2026-09-20', category: '藝術' }]
+  },
+  "高雄國家體育場": { 
     name: "高雄國家體育場", 
     city: "Kaohsiung", 
     img: "https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?w=800", 
     capacity: "55,000", 
     status: "Hot", 
-    theme: "#FF8A65",
-    events: [
-      { id: 'e4', title: 'ULTRA Taiwan 2026', date: '2026-11-16', price: '$3,600', category: '電音' }
-    ]
+    events: [{ id: 'e7', title: 'ULTRA Taiwan 2026', date: '2026-11-16', category: '電音' }]
+  },
+  "高雄巨蛋": { 
+    name: "高雄巨蛋", 
+    city: "Kaohsiung", 
+    img: "https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?w=800", 
+    capacity: "15,000", 
+    status: "Active", 
+    events: [{ id: 'e8', title: '亞洲巡迴演唱會', date: '2026-12-05', category: '音樂' }]
+  },
+  "高雄流行音樂中心": {
+    name: "高雄流行音樂中心",
+    city: "Kaohsiung",
+    img: "https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?w=800",
+    capacity: "6,000",
+    status: "Active",
+    events: [{ id: 'e9', title: '海風音樂節', date: '2026-10-10', category: '音樂' }]
+  },
+  "衛武營": {
+    name: "衛武營",
+    city: "Kaohsiung",
+    img: "https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?w=800",
+    capacity: "2,260",
+    status: "Active",
+    events: [{ id: 'e10', title: '交響樂之夜', date: '2026-11-20', category: '藝術' }]
   }
 };
 
 export const VenueDetailView = ({ venueId, onBack }: VenueDetailViewProps) => {
-  // 優先抓取對應區域，抓不到則抓北部場館
-  const venue = MOCK_VENUES_DATA[venueId] || MOCK_VENUES_DATA["north"];
+  // ✅ 嚴格匹配：確保點擊任何一個場館都能找到對應資料
+  const venue = MOCK_VENUES_DATA[venueId] || MOCK_VENUES_DATA["台北大巨蛋"];
 
   return (
     <motion.div 
@@ -55,14 +96,13 @@ export const VenueDetailView = ({ venueId, onBack }: VenueDetailViewProps) => {
       animate={{ y: 0 }}
       exit={{ y: '100%' }}
       transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-      className="fixed inset-0 z-[150] bg-[#F0FDFB] flex flex-col h-full font-sans overflow-hidden"
+      className="fixed inset-0 z-[150] bg-[#F0FDFB] flex flex-col h-full overflow-hidden"
     >
       {/* 頂部海報區 */}
       <div className="relative h-[35vh] w-full shrink-0">
         <img src={venue.img} className="w-full h-full object-cover" alt={venue.name} />
         <div className="absolute inset-0 bg-gradient-to-t from-[#F0FDFB] via-transparent to-black/20" />
         
-        {/* 返回按鈕 */}
         <button 
           onClick={onBack} 
           className="absolute top-12 left-6 w-12 h-12 flex items-center justify-center bg-white/80 backdrop-blur-md rounded-2xl shadow-xl text-slate-700 active:scale-90 transition-transform border border-white"
@@ -71,11 +111,10 @@ export const VenueDetailView = ({ venueId, onBack }: VenueDetailViewProps) => {
         </button>
       </div>
       
-      {/* 核心內容區 (負 Margin 上移產生層次感) */}
+      {/* 核心內容區 */}
       <div className="flex-1 px-6 -mt-16 relative z-10 overflow-y-auto no-scrollbar pb-32">
-        <div className="bg-white rounded-[3.5rem] p-8 shadow-2xl shadow-teal-900/5 space-y-8 border border-white">
+        <div className="bg-white rounded-[3.5rem] p-8 shadow-2xl space-y-8 border border-white">
           
-          {/* 場館標題 */}
           <div className="space-y-3">
             <div className="flex items-center gap-2">
               <div className="bg-[#99E6D9]/20 text-[#2EB6A3] text-[10px] font-black px-3 py-1 rounded-full border border-[#99E6D9]/30 uppercase tracking-widest">
@@ -92,7 +131,7 @@ export const VenueDetailView = ({ venueId, onBack }: VenueDetailViewProps) => {
             </div>
           </div>
 
-          {/* 數據卡片區 */}
+          {/* 數據卡片 */}
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-[#F8FAFC] p-6 rounded-[2.5rem] border-b-4 border-slate-200">
               <Users size={20} className="text-[#99E6D9] mb-3" />
@@ -109,10 +148,7 @@ export const VenueDetailView = ({ venueId, onBack }: VenueDetailViewProps) => {
 
           {/* 活動列表 */}
           <div className="space-y-6">
-            <div className="flex items-center justify-between px-2">
-              <h3 className="text-lg font-black text-slate-800">即將登場的驚喜</h3>
-              <span className="text-xs font-black text-[#99E6D9]">查看場館行程</span>
-            </div>
+            <h3 className="text-lg font-black text-slate-800 px-2">即將登場的驚喜</h3>
             
             <div className="space-y-4">
               {venue.events.map((event: any) => (
@@ -125,7 +161,6 @@ export const VenueDetailView = ({ venueId, onBack }: VenueDetailViewProps) => {
                   <div className="flex-1">
                     <div className="text-[10px] font-black text-slate-300 uppercase mb-1">{event.category}</div>
                     <h4 className="font-black text-slate-700 text-sm leading-tight">{event.title}</h4>
-                    <div className="text-xs font-bold text-[#FF8A65] mt-1">{event.price}</div>
                   </div>
                   
                   <div className="w-8 h-8 flex items-center justify-center bg-slate-50 rounded-full text-slate-300">
@@ -138,11 +173,11 @@ export const VenueDetailView = ({ venueId, onBack }: VenueDetailViewProps) => {
         </div>
       </div>
 
-      {/* 底部功能按鈕 */}
-      <div className="fixed bottom-0 left-0 right-0 p-6 bg-white/80 backdrop-blur-xl border-t border-slate-100 z-50 flex gap-4">
-        <button className="flex-1 h-16 bg-[#2EB6A3] rounded-3xl text-white font-black shadow-[0_8px_0_#1E8D7D] active:shadow-none active:translate-y-[8px] transition-all flex items-center justify-center gap-2">
+      {/* 底部按鈕 */}
+      <div className="fixed bottom-0 left-0 right-0 p-6 bg-white/80 backdrop-blur-xl border-t border-slate-100 z-50">
+        <button className="w-full h-16 bg-[#2EB6A3] rounded-3xl text-white font-black shadow-[0_8px_0_#1E8D7D] active:shadow-none active:translate-y-[8px] transition-all flex items-center justify-center gap-2">
           <Navigation size={20} />
-          立即導航
+          前往購票
         </button>
       </div>
     </motion.div>
